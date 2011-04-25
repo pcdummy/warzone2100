@@ -1,4 +1,6 @@
-SUBDIRS = miniupnpc
+SUBDIRS = \
+	miniupnpc \
+	bson
 
 AM_CPPFLAGS = $(WZ_CPPFLAGS) $(QT4_CFLAGS)
 AM_CFLAGS = $(WZ_CFLAGS)
@@ -20,4 +22,7 @@ libnetplay_a_SOURCES = \
 	netsocket.cpp \
 	nettypes.cpp
 
-libnetplay_a_LIBADD = $(top_builddir)/lib/framework/libframework.a $(top_builddir)/lib/netplay/miniupnpc/libminiupnpc.a
+libnetplay_a_LIBADD = \
+	$(top_builddir)/lib/framework/libframework.a \
+	$(top_builddir)/lib/netplay/miniupnpc/libminiupnpc.a \
+	$(top_builddir)/lib/netplay/bson/libbson.a
