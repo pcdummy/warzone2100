@@ -35,6 +35,8 @@
 
 #include "lib/framework/frame.h"
 
+extern const int LOG_LOBBY;
+
 namespace Lobby
 {
 const qint32 PROTOCOL = 4;
@@ -74,14 +76,14 @@ enum RETURN_CODES
 //        as multiint is passing them to iV_DrawText.
 struct GAME
 {
-    uint32_t port;                      ///< Port hosting on.
+    qint32 port;                      ///< Port hosting on.
     std::string host;                   ///< IPv4, IPv6 or DNS Name of the host.
     std::string description;            ///< Game Description.
-    uint32_t currentPlayers;            ///< Number of joined players.
-    uint32_t maxPlayers;                ///< Maximum number of players.
+    qint32 currentPlayers;            ///< Number of joined players.
+    qint32 maxPlayers;                ///< Maximum number of players.
     std::string versionstring;          ///< Version string.
-    uint32_t game_version_major;        ///< Minor NETCODE version.
-    uint32_t game_version_minor;        ///< Major NETCODE version.
+    qint32 game_version_major;        ///< Minor NETCODE version.
+    qint32 game_version_minor;        ///< Major NETCODE version.
     bool isPrivate;                     ///< Password protected?
     std::string modlist;                ///< display string for mods.
     std::string  mapname;               ///< name of map hosted.
@@ -113,9 +115,9 @@ public:
     RETURN_CODES login(const QString& password);
     RETURN_CODES logout();
 
-    RETURN_CODES addGame(char** result, const uint32_t port, const uint32_t maxPlayers,
+    RETURN_CODES addGame(char** result, const qint32 port, const qint32 maxPlayers,
                          const char* description, const char* versionstring,
-                         const uint32_t game_version_major, const uint32_t game_version_minor,
+                         const qint32 game_version_major, const qint32 game_version_minor,
                          const bool isPrivate, const char* modlist,
                          const char* mapname, const char* hostplayer);
 

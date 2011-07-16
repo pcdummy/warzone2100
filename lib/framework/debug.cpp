@@ -72,7 +72,6 @@ const int LOG_TERRAIN = Logger::instance().addLoggingLevel("terrain", false);
 const int LOG_FEATURE = Logger::instance().addLoggingLevel("feature", false);
 const int LOG_INPUT = Logger::instance().addLoggingLevel("input", false);
 const int LOG_CONSOLE = Logger::instance().addLoggingLevel("console", false);
-const int LOG_LOBBY = Logger::instance().addLoggingLevel("lobby", false);
 
 // MSVC specific rotuines to set/clear allocation tracking
 #if defined(WZ_CC_MSVC) && defined(DEBUG)

@@ -17,22 +17,27 @@
     along with Warzone 2100; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 */
+
+// Self
+#include "netlobby.h"
+
 // Qt Core
 #include <QtCore/QtEndian>
 #include <QtCore/QFile>
 
-// Debugging normaly commented.
-// #include <QtCore/QDebug>
-
 // QT Network
-#include <QtNetwork/QSslCertificate>
+#if !defined(NO_SSL)
+#  include <QtNetwork/QSslCertificate>
+#endif
 
 // QJson
 #include <qjson/parser.h>
 #include <qjson/serializer.h>
 
-// Self
-#include "netlobby.h"
+// Framework (for MSVC and i18n and logging)
+#include "lib/framework/frame.h"
+
+const int LOG_LOBBY = Logger::instance().addLoggingLevel("lobby", false);
 
 namespace Lobby
 {
@@ -50,7 +55,7 @@ Client::Client()
 
 void Client::stop()
 {
-    debug(LOG_LOBBY, "Stopping");
+    wzLog(LOG_NET) << "Lobby client: Stopping";
 
     // remove the game from the masterserver,
     delGame();
@@ -62,9 +67,9 @@ void Client::stop()
     delete socket_;
 }
 
-RETURN_CODES Client::addGame(char** result, const uint32_t port, const uint32_t maxPlayers,
+RETURN_CODES Client::addGame(char** result, const qint32 port, const qint32 maxPlayers,
                              const char* description, const char* versionstring,
-                             const uint32_t game_version_major, const uint32_t game_version_minor,
+                             const qint32 game_version_major, const qint32 game_version_minor,
                              const bool isPrivate, const char* modlist,
                              const char* mapname, const char* hostplayer)
 {
@@ -97,13 +102,13 @@ RETURN_CODES Client::addGame(char** result, const uint32_t port, const uint32_t 
 
     QVariantMap resultMap = callResult_.result.toMap();
     if (!resultMap.contains("gameId") || !resultMap.contains("result"))
-	{
+    {
         freeCallResult_();
         return setError_(INVALID_DATA, _("Received invalid addGame data."));
     }
 
     gameId_ = resultMap["gameId"].toLongLong();
-    asprintf(result, resultMap["result"].toString().toUtf8().constData());
+    // asprintf(result, resultMap["result"].toString().toUtf8().constData());
 
     freeCallResult_();
     return LOBBY_NO_ERROR;
@@ -199,7 +204,7 @@ RETURN_CODES Client::updatePlayer(const unsigned int index, const char* name)
 
 RETURN_CODES Client::listGames(const int maxGames)
 {
-    uint32_t gameCount = 0;
+    qint32 gameCount = 0;
     GAME game;
 
     // Clear old games.
@@ -280,27 +285,30 @@ inline bool Client::isConnected()
 Client& Client::addCACertificate(const QString& path)
 {
 #if defined(NO_SSL)
-    debug(LOG_LOBBY, "Cannot add an SSL Certificate as SSL is not compiled in.");
+    wzLog(LOG_NET) << "Cannot add an SSL Certificate as SSL is not compiled in.";
     return *this;
 #else
-    debug(LOG_LOBBY, "Adding the CA certificate %s.", path.toUtf8().constData());
+    wzLog(LOG_NET) << QString("Adding the CA certificate %1.").arg(path);
 
     QFile cafile(path);
     if (!cafile.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-        debug(LOG_ERROR, "Cannot open the CA certificate %s!", path.toUtf8().constData());
+        wzLog(LOG_ERROR) << QString("Cannot open the CA certificate %1!")
+                                    .arg(path);
         return *this;
     }
 
     QSslCertificate certificate(&cafile, QSsl::Pem);
     if (!certificate.isValid())
     {
-        debug(LOG_ERROR, "Failed to load the CA certificate %s!", path.toUtf8().constData());
+        wzLog(LOG_ERROR) << QString("Failed to load the CA certificate %1!")
+                                    .arg(path);
         return *this;
     }
     cafile.close();
 
-    debug(LOG_LOBBY, "Cert common name: %s", certificate.subjectInfo(QSslCertificate::CommonName).toUtf8().constData());
+    wzLog(LOG_NET) << QString("Cert common name: %1")
+                        .arg(certificate.subjectInfo(QSslCertificate::CommonName));
 
     cacerts_.append(certificate);
 
@@ -327,12 +335,14 @@ RETURN_CODES Client::connect()
     // Connect
     if (useSSL_ == false)
     {
-        debug(LOG_LOBBY, "Connecting to \"[%s]:%d\".", host_.toUtf8().constData(), port_);
+        wzLog(LOG_NET) << QString("Connecting to \"[%1]:%2\".")
+                            .arg(host_).arg(port_);
         socket_->connectToHost(host_, port_);
     }
     else
     {
-        debug(LOG_LOBBY, "Connecting to \"[%s]:%d\" with SSL enabled.", host_.toUtf8().constData(), port_);
+        wzLog(LOG_NET) << QString("Connecting to \"[%1]:%2\" with SSL enabled.")
+                            .arg(host_).arg(port_);
         socket_->setCaCertificates(cacerts_);
         socket_->connectToHostEncrypted(host_, port_);
     }
@@ -346,8 +356,8 @@ RETURN_CODES Client::connect()
             || (!useSSL_ && !socket_->waitForConnected()))
     {
 #endif
-        debug(LOG_ERROR, "Cannot connect to lobby \"[%s]:%d\": %s.",
-              host_.toUtf8().constData(), port_, socket_->errorString().toUtf8().constData());
+        wzLog(LOG_ERROR) << QString("Cannot connect to lobby \"[%1]:%2\": %3.")
+                                    .arg(host_).arg(port_).arg(socket_->errorString());
         return setError_(TRANSPORT_ERROR, "");
     }
 
@@ -361,8 +371,8 @@ RETURN_CODES Client::connect()
     // Send Version command
     if (socket_->write(version) == -1)
     {
-        debug(LOG_ERROR, "Cannot send version string to lobby \"%s:%d\": %s",
-              host_.toUtf8().constData(), port_, socket_->errorString().toUtf8().constData());
+        wzLog(LOG_ERROR) << QString("Cannot send version string to lobby \"[%1]:%2\": %3.")
+                                    .arg(host_).arg(port_).arg(socket_->errorString());
         return setError_(TRANSPORT_ERROR, "");
     }
 
@@ -378,7 +388,7 @@ RETURN_CODES Client::login(const QString& password)
     }
     else if (useAuth_ == false)
     {
-        debug(LOG_LOBBY, "Authentication is disabled.");
+        wzLog(LOG_NET) << "Authentication is disabled.";
         return LOBBY_NO_ERROR;
     }
 
@@ -396,7 +406,7 @@ RETURN_CODES Client::login(const QString& password)
     }
     else
     {
-        debug(LOG_LOBBY, "Not trying to login no password/token supplied.");
+        wzLog(LOG_NET) << "Not trying to login no password/token supplied.";
 
         // Do not return an error for internal use.
         return LOBBY_NO_ERROR;
@@ -407,7 +417,7 @@ RETURN_CODES Client::login(const QString& password)
         // Reset login credentials on a wrong login
         if (lastError_.code == WRONG_LOGIN)
         {
-            debug(LOG_LOBBY, "Login failed!");
+            wzLog(LOG_NET) << "Lobby Login failed!";
             token_.clear();
             session_.clear();
             isAuthenticated_ = false;
@@ -421,7 +431,7 @@ RETURN_CODES Client::login(const QString& password)
     QVariantMap resultMap = callResult_.result.toMap();
     if (!resultMap.contains("token") || !resultMap.contains("session"))
     {
-        debug(LOG_LOBBY, "Login failed!");
+        wzLog(LOG_NET) << "Lobby Login failed!";
         freeCallResult_();
         return setError_(INVALID_DATA, _("Received invalid login data."));
     }
@@ -429,7 +439,7 @@ RETURN_CODES Client::login(const QString& password)
     token_ = resultMap["token"].toString();
     session_ = resultMap["session"].toString();
 
-    debug(LOG_LOBBY, "Received Session \"%s\"", session_.toUtf8().constData());
+    wzLog(LOG_NET) << QString("Received Session \"%1\"").arg(session_);
 
     isAuthenticated_ = true;
 
@@ -491,7 +501,7 @@ RETURN_CODES Client::call_(const char* command, const QVariantMap& kwargs)
         return lastError_.code;
     }
 
-    debug(LOG_LOBBY, "Calling \"%s\" on the lobby", command);
+    wzLog(LOG_NET) << QString("Calling \"%1\" on the lobby").arg(command);
 
     callId_ += 1;
     QVariantList callArgs;
@@ -513,8 +523,8 @@ RETURN_CODES Client::call_(const char* command, const QVariantMap& kwargs)
 
     if (socket_->write(block) == -1)
     {
-        debug(LOG_ERROR, "Failed sending command \"%s\" to the lobby: %s.",
-              command, socket_->errorString().toUtf8().constData());
+        wzLog(LOG_ERROR) << QString("Failed sending command \"%1\" to the lobby: %2.")
+                                    .arg(command).arg(socket_->errorString());
         return setError_(TRANSPORT_ERROR, _("Failed to communicate with the lobby."));
     }
 
@@ -526,8 +536,8 @@ RETURN_CODES Client::call_(const char* command, const QVariantMap& kwargs)
     {
         if (!socket_->waitForReadyRead())
         {
-            debug(LOG_ERROR, "Failed reading the results size for \"%s\" from the lobby: %s.",
-                  command, socket_->errorString().toUtf8().constData());
+            wzLog(LOG_ERROR) << QString("Failed reading the results size for \"%1\" to the lobby: %2.")
+                                        .arg(command).arg(socket_->errorString());
             return setError_(TRANSPORT_ERROR, _("Failed to communicate with the lobby."));
         }
 
@@ -537,8 +547,8 @@ RETURN_CODES Client::call_(const char* command, const QVariantMap& kwargs)
         {
             if (!socket_->waitForReadyRead())
             {
-                debug(LOG_ERROR, "Failed reading the result for \"%s\" from the lobby: %s.",
-                      command, socket_->errorString().toUtf8().constData());
+                wzLog(LOG_ERROR) << QString("Failed reading the result for \"%1\" to the lobby: %2.")
+                                            .arg(command).arg(socket_->errorString());
                 return setError_(TRANSPORT_ERROR, _("Failed to communicate with the lobby."));
             }
         }
@@ -555,8 +565,8 @@ RETURN_CODES Client::call_(const char* command, const QVariantMap& kwargs)
     QVariantMap result = parser.parse(jsonData, &ok).toMap();
     if (!ok)
     {
-        debug(LOG_ERROR, "Received an invalid JSON Object, line %d, error: %s",
-              parser.errorLine(), parser.errorString().toUtf8().constData());
+        wzLog(LOG_ERROR) << QString("Received an invalid JSON Object, line %1, error: %2")
+                                    .arg(parser.errorLine()).arg(parser.errorString());
         return setError_(INVALID_DATA, _("Failed to communicate with the lobby."));
     }
 
@@ -565,25 +575,22 @@ RETURN_CODES Client::call_(const char* command, const QVariantMap& kwargs)
 
     if (!result.contains("reply"))
     {
-        debug(LOG_ERROR, "%s", "Received an invalid answer, no \"reply\" received.");
+        wzLog(LOG_ERROR) << "Received an invalid answer, no \"reply\" received.";
         return setError_(INVALID_DATA, _("Failed to communicate with the lobby."));
     }
 
     QVariantList resultList = result["reply"].toList();
     if (!resultList.size() == 3)
     {
-        debug(LOG_ERROR,
-              "Received an invalid Answer %d number of list args instead of 3",
-              resultList.size());
+        wzLog(LOG_ERROR) << QString("Received an invalid Answer %1 number of list args instead of 3")
+                                    .arg(resultList.size());
         return setError_(INVALID_DATA, _("Failed to communicate with the lobby."));
     }
 
     if (resultList.at(0).toInt() != LOBBY_NO_ERROR)
     {
-        debug(LOG_LOBBY,
-              "Received: server error %d: %s",
-              resultList.at(0).toInt(),
-              resultList.at(1).toString().toUtf8().constData());
+        wzLog(LOG_NET) << QString("Received: server error %1: %2")
+                            .arg(resultList.at(0).toInt()).arg(resultList.at(1).toString());
 
         setError_(callResult_.code,
                   _("Got server error: %s"),

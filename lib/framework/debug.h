@@ -171,8 +171,6 @@ extern const int LOG_TERRAIN;
 extern const int LOG_FEATURE;
 extern const int LOG_INPUT;
 extern const int LOG_CONSOLE;
-extern const int LOG_LOBBY;
-extern const int LOG_LAST;
 
 /**
  * Call once to initialize the debug logging system.
