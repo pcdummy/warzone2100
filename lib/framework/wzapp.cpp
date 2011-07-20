@@ -131,8 +131,7 @@ WzMainWindow::WzMainWindow(QSize resolution, const QGLFormat &format, QWidget *p
 	myself = this;
 	notReadyToPaint = true;
 	timer = new QTimer(this);
-	tickCount.start();
-	connect(timer, SIGNAL(timeout()), this, SLOT(tick()));
+    connect(timer, SIGNAL(timeout()), this, SLOT(tick()));
 	for (int i = 0; i < CURSOR_MAX; cursors[i++] = NULL) ;
 	timer->start(0);
 	setAutoFillBackground(false);
@@ -713,11 +712,6 @@ void wzQuit()
 void wzScreenFlip()
 {
 	WzMainWindow::instance()->swapBuffers();
-}
-
-int wzGetTicks()
-{
-	return WzMainWindow::instance()->ticks();
 }
 
 /****************************************/

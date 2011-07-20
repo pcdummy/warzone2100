@@ -32,6 +32,8 @@
 #include <sys/types.h>
 #endif
 
+#include <QtCore/QTime>
+
 #include "lib/framework/wzapp.h"
 #include "lib/netplay/netplay.h"
 #include "lib/ivis_opengl/bitimage.h"

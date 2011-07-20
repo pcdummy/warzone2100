@@ -10,8 +10,17 @@ AM_CXXFLAGS = $(WZ_CXXFLAGS) $(QT4_CFLAGS)
 AM_LFLAGS = $(FLEX_FLAGS)
 AM_YFLAGS = -d
 
-MOCHEADER = wzapp.h
-MOCEDFILES = $(MOCHEADER:%.h=%_moc.cpp)
+
+MOCHEADER = \
+	wzapp.h \
+	wzticker.h
+MOCEDFILES = \
+	wzapp_moc.cpp \
+	wzticker_moc.cpp
+
+
+%_moc.cpp: %.h
+	$(MOC4) -o $@ $<
 
 %_moc.cpp: %.h
 	$(MOC4) -o $@ $<
@@ -79,7 +88,7 @@ noinst_HEADERS = \
 	wzglobal.h
 
 libframework_a_SOURCES = \
-	wzapp_moc.cpp \
+	${MOCEDFILES} \
 	wzapp.cpp \
 	resource_lexer.lex.cpp \
 	resource_parser.tab.cpp \

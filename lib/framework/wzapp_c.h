@@ -36,7 +36,6 @@ void wzShowMouse(bool visible); ///< Show the Mouse?
 void wzGrabMouse(void);		///< Trap mouse cursor in application window
 void wzReleaseMouse(void);	///< Undo the wzGrabMouse operation
 bool wzActiveWindow(void);	///< Whether application currently has the mouse pointer over it
-int wzGetTicks(void);		///< Milliseconds since start of game
 void wzFatalDialog(const char *text);	///< Throw up a modal warning dialog
 
 // Thread related

@@ -25,7 +25,6 @@
 #include <QtCore/QTimer>
 #include <QtOpenGL/QGLWidget>
 #include <QtCore/QBuffer>
-#include <QtCore/QTime>
 #include <QtCore/QThread>
 #include <QtCore/QMutex>
 #include <QtCore/QSemaphore>
@@ -72,7 +71,6 @@ private:
 
 	QCursor *cursors[CURSOR_MAX];
 	QTimer *timer;
-	QTime tickCount;
 	QFont regularFont, boldFont, smallFont, scaledFont;
 	bool notReadyToPaint;  ///< HACK Don't draw during initial show(), since some global variables apparently aren't set up.
 	static WzMainWindow *myself;
@@ -88,7 +86,6 @@ public:
 	void setCursor(QCursor cursor);
 	void setFontType(enum iV_fonts FontID);
 	void setFontSize(float size);
-	int ticks() { return tickCount.elapsed(); }
 	void setReadyToPaint() { notReadyToPaint = false; }
 #if 0
 	// Re-enable when Qt's font rendering is improved.

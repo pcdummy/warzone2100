@@ -25,9 +25,8 @@
 
 #include "lib/framework/frame.h"
 #include "lib/framework/wzapp_c.h"
+#include "lib/framework/wzticker.h"
 #include "netsocket.h"
-
-#include "lib/framework/wzapp_c.h"
 
 #include <vector>
 #include <algorithm>
