@@ -38,7 +38,7 @@
 #endif
 
 #include "lib/exceptionhandler/dumpinfo.h"
-#include "file.h"
+#include "lib/framework/file.h"
 #include "lib/ivis_opengl/piestate.h"
 #include "lib/ivis_opengl/pieclip.h"
 #include "lib/ivis_opengl/screen.h"
@@ -709,11 +709,6 @@ void wzQuit()
 	WzMainWindow::instance()->close();
 }
 
-void wzScreenFlip()
-{
-	WzMainWindow::instance()->swapBuffers();
-}
-
 /****************************************/
 /***     Mouse and keyboard support   ***/
 /****************************************/
@@ -1086,12 +1081,6 @@ void iV_SetTextSize(float size)
 	WzMainWindow::instance()->setFontSize(size);
 }
 #endif
-
-void wzFatalDialog(const char *text)
-{
-	crashing = true;
-	QMessageBox::critical(NULL, "Fatal error", text);
-}
 
 static int WZkeyToQtKey(int code)
 {

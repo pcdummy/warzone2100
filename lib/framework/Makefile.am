@@ -11,22 +11,7 @@ AM_LFLAGS = $(FLEX_FLAGS)
 AM_YFLAGS = -d
 
 
-MOCHEADER = \
-	wzapp.h \
-	wzticker.h
-MOCEDFILES = \
-	wzapp_moc.cpp \
-	wzticker_moc.cpp
-
-
-%_moc.cpp: %.h
-	$(MOC4) -o $@ $<
-
-%_moc.cpp: %.h
-	$(MOC4) -o $@ $<
-
 BUILT_SOURCES = \
-	$(MOCEDFILES) \
 	resource_lexer.lex.cpp \
 	resource_parser.tab.cpp \
 	resource_parser.tab.hpp \
@@ -34,14 +19,7 @@ BUILT_SOURCES = \
 	strres_parser.tab.cpp \
 	strres_parser.tab.hpp
 
-CLEANFILES = \
-	$(MOCEDFILES) \
-	resource_lexer.lex.cpp \
-	resource_parser.tab.cpp \
-	resource_parser.tab.hpp \
-	strres_lexer.lex.cpp \
-	strres_parser.tab.cpp \
-	strres_parser.tab.hpp
+CLEANFILES = ${BUILT_SOURCES}
 
 EXTRA_DIST = \
 	resource_lexer.l resource_parser.y \
@@ -49,8 +27,6 @@ EXTRA_DIST = \
 
 noinst_LIBRARIES = libframework.a
 noinst_HEADERS = \
-	$(MOCHEADER) \
-	wzapp_c.h \
 	strres_parser.tab.hpp \
 	resource_parser.tab.hpp \
 	crc.h \
@@ -83,14 +59,11 @@ noinst_HEADERS = \
 	endian_hack.h \
 	gettext.h \
 	macros.h \
-	wzapp_c.h \
 	wzthread.h \
 	wzfs.h \
 	wzglobal.h
 
 libframework_a_SOURCES = \
-	${MOCEDFILES} \
-	wzapp.cpp \
 	wzthread.cpp \
 	resource_lexer.lex.cpp \
 	resource_parser.tab.cpp \

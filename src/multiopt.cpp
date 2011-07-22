@@ -54,7 +54,7 @@
 #include "multirecv.h"
 #include "scriptfuncs.h"
 
-#include "lib/framework/wzapp_c.h" // wzYieldCurrentThread
+#include "lib/framework/wzthread.h" // wzYieldCurrentThread
 #include "lib/framework/wzticker.h" // wzGetTicks
 
 // ////////////////////////////////////////////////////////////////////////////

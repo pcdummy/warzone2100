@@ -27,12 +27,12 @@
 
 #include <string.h>
 
+#include "wzapp_c.h"
 #include "lib/framework/frameresource.h"
 #include "lib/framework/input.h"
 #include "lib/framework/file.h"
 #include "lib/framework/physfs_ext.h"
 #include "lib/framework/strres.h"
-#include "lib/framework/wzapp_c.h"
 #include "lib/ivis_opengl/piemode.h"
 #include "lib/ivis_opengl/piestate.h"
 #include "lib/ivis_opengl/tex.h"

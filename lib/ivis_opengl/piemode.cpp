@@ -28,7 +28,6 @@
 
 #include "lib/framework/frame.h"
 #include "lib/framework/opengl.h"
-#include "lib/framework/wzapp_c.h"
 
 #include "lib/ivis_opengl/piedef.h"
 #include "lib/ivis_opengl/piestate.h"
@@ -39,6 +38,11 @@
 #include "lib/ivis_opengl/tex.h"
 #include "lib/ivis_opengl/pieclip.h"
 #include "screen.h"
+
+// FIXME: This needs a better place.
+#include <QtGui/QApplication>
+#include <QtGui/QWidget>
+#include <QtOpenGL/QGLWidget>
 
 /***************************************************************************/
 /*
@@ -95,7 +99,15 @@ void pie_ScreenFlip(int clearMode)
 	GLbitfield clearFlags = 0;
 
 	screenDoDumpToDiskIfRequired();
-	wzScreenFlip();
+
+    //FIXME: This needs a better Place!
+    QWidget* window = QApplication::activeWindow();
+    if (window)
+    {
+        QGLWidget* glWindow = static_cast<QGLWidget*>(window);
+        glWindow->swapBuffers();
+    }
+    
 	if (!(clearMode & CLEAR_OFF_AND_NO_BUFFER_DOWNLOAD))
 	{
 		glDepthMask(GL_TRUE);

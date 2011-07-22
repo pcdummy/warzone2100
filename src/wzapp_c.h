@@ -21,13 +21,13 @@
 #ifndef __INCLUDED_WZAPP_C_H__
 #define __INCLUDED_WZAPP_C_H__
 
+#include <lib/framework/cursors.h>
+
 void wzQuit(void);              ///< Quit game
 void wzSetCursor(CURSOR index);
-void wzScreenFlip(void);	///< Swap the graphics buffers
 void wzShowMouse(bool visible); ///< Show the Mouse?
 void wzGrabMouse(void);		///< Trap mouse cursor in application window
 void wzReleaseMouse(void);	///< Undo the wzGrabMouse operation
 bool wzActiveWindow(void);	///< Whether application currently has the mouse pointer over it
-void wzFatalDialog(const char *text);	///< Throw up a modal warning dialog
 
 #endif

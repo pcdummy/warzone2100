@@ -35,7 +35,7 @@
 #include "lib/framework/frame.h"
 #include "lib/framework/cursors.h"
 #include "lib/ivis_opengl/textdraw.h"
-#include "input.h"
+#include "lib/framework/input.h"
 
 class WzConfig : public QSettings
 {

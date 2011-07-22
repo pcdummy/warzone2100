@@ -27,7 +27,7 @@
 #include <string.h>
 
 // --------------------------------------------------------------------
-#include "lib/framework/wzapp.h"
+#include "wzapp.h"
 #include "lib/framework/math_ext.h"
 #include "lib/framework/strres.h"
 #include "lib/gamelib/gtime.h"

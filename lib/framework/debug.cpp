@@ -26,11 +26,12 @@
 
 #include "frame.h"
 
+#include <QtGui/QMessageBox>
+
 #include <string.h>
 #include <stdio.h>
 #include <time.h>
 #include "string_ext.h"
-#include "lib/framework/wzapp_c.h"
 #include "lib/gamelib/gtime.h"
 
 extern void NotifyUserOfError(char *);		// will throw up a notifier on error
@@ -94,6 +95,17 @@ static const char *code_part_names[] = {
 static char inputBuffer[2][MAX_LEN_LOG_LINE];
 static bool useInputBuffer1 = false;
 static bool debug_flush_stderr = false;
+
+
+/**
+ * Prints a message box with the error.
+ *
+ * FIXME: Replace/Move.
+ */
+static void wzFatalDialog(const char *text)
+{
+    QMessageBox::critical(NULL, "Fatal error", text);
+}
 
 /**
  * Convert code_part names to enum. Case insensitive.

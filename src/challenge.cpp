@@ -34,7 +34,8 @@
 
 #include <QtCore/QTime>
 
-#include "lib/framework/wzapp.h"
+#include "wzapp.h"
+
 #include "lib/netplay/netplay.h"
 #include "lib/ivis_opengl/bitimage.h"
 #include "lib/ivis_opengl/pieblitfunc.h"
