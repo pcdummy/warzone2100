@@ -1335,6 +1335,14 @@ int main(int argc, char *argv[])
 	char buf[256];
 	ssprintf(buf, "Video Mode %d x %d (%s)", w, h, war_getFullscreen() ? "fullscreen" : "window");
 	addDumpInfo(buf);
+    
+    if (!screenInitialise())
+    {
+        return EXIT_FAILURE;
+    }    
+    
+    /* Initialise the input system */
+    inputInitialise();
 
 	debug(LOG_MAIN, "Final initialization");
 	if (!frameInitialise())
@@ -1398,6 +1406,8 @@ int main(int argc, char *argv[])
 	debug(LOG_MAIN, "Entering main loop");
 	app.exec();
 	saveConfig();
+    debug(LOG_NEVER, "Screen shutdown!");    
+    screenShutDown();
 	systemShutdown();
 	debug(LOG_MAIN, "Completed shutting down Warzone 2100");
 	return EXIT_SUCCESS;
