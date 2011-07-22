@@ -25,9 +25,6 @@
 #include <QtCore/QTimer>
 #include <QtOpenGL/QGLWidget>
 #include <QtCore/QBuffer>
-#include <QtCore/QThread>
-#include <QtCore/QMutex>
-#include <QtCore/QSemaphore>
 #include <QtCore/QSettings>
 #include <physfs.h>
 
@@ -95,28 +92,6 @@ public:
 public slots:
 	void tick();
 	void close();
-};
-
-struct _wzThread : public QThread
-{
-	_wzThread(int (*threadFunc_)(void *), void *data_) : threadFunc(threadFunc_), data(data_) {}
-	void run()
-	{
-		ret = (*threadFunc)(data);
-	}
-	int (*threadFunc)(void *);
-	void *data;
-	int ret;
-};
-
-// This one couldn't be easier...
-struct _wzMutex : public QMutex
-{
-};
-
-struct _wzSemaphore : public QSemaphore
-{
-	_wzSemaphore(int startValue = 0) : QSemaphore(startValue) {}
 };
 
 #endif

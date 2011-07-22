@@ -21,14 +21,6 @@
 #ifndef __INCLUDED_WZAPP_C_H__
 #define __INCLUDED_WZAPP_C_H__
 
-struct _wzThread;
-struct _wzMutex;
-struct _wzSemaphore;
-
-typedef struct _wzThread WZ_THREAD;
-typedef struct _wzMutex WZ_MUTEX;
-typedef struct _wzSemaphore WZ_SEMAPHORE;
-
 void wzQuit(void);              ///< Quit game
 void wzSetCursor(CURSOR index);
 void wzScreenFlip(void);	///< Swap the graphics buffers
@@ -37,21 +29,5 @@ void wzGrabMouse(void);		///< Trap mouse cursor in application window
 void wzReleaseMouse(void);	///< Undo the wzGrabMouse operation
 bool wzActiveWindow(void);	///< Whether application currently has the mouse pointer over it
 void wzFatalDialog(const char *text);	///< Throw up a modal warning dialog
-
-// Thread related
-WZ_THREAD *wzThreadCreate(int (*threadFunc)(void *), void *data);
-int wzThreadJoin(WZ_THREAD *thread);
-void wzThreadStart(WZ_THREAD *thread);
-bool wzIsThreadDone(WZ_THREAD *thread);
-void wzYieldCurrentThread(void);
-WZ_MUTEX *wzMutexCreate(void);
-void wzMutexDestroy(WZ_MUTEX *mutex);
-void wzMutexLock(WZ_MUTEX *mutex);
-void wzMutexUnlock(WZ_MUTEX *mutex);
-WZ_SEMAPHORE *wzSemaphoreCreate(int startValue);
-void wzSemaphoreDestroy(WZ_SEMAPHORE *semaphore);
-void wzSemaphoreWait(WZ_SEMAPHORE *semaphore);
-void wzSemaphorePost(WZ_SEMAPHORE *semaphore);
-int wzSemaphoreAvailable(WZ_SEMAPHORE *semaphore);
 
 #endif

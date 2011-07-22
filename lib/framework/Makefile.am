@@ -84,12 +84,14 @@ noinst_HEADERS = \
 	gettext.h \
 	macros.h \
 	wzapp_c.h \
+	wzthread.h \
 	wzfs.h \
 	wzglobal.h
 
 libframework_a_SOURCES = \
 	${MOCEDFILES} \
 	wzapp.cpp \
+	wzthread.cpp \
 	resource_lexer.lex.cpp \
 	resource_parser.tab.cpp \
 	strres_lexer.lex.cpp \
