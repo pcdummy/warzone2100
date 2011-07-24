@@ -39,7 +39,7 @@
 # define PACKAGE_DISTRIBUTOR "UNKNOWN"
 #endif
 
-static const char endl[] =
+static const char dump_endl[] =
 #if defined(WZ_OS_WIN)
     "\r\n";
 #else
@@ -55,6 +55,37 @@ static std::deque<std::vector<char> > dbgMessages;
 
 // used to add custom info to the crash log
 static std::vector<char> miscData;
+
+
+// This class receives log/debug messages from the logger and stores them.
+class LoggerDumpListener : public LoggerDestination
+{
+    void write(const QString& message)
+    {
+        const char *str = message.toUtf8().constData();
+
+        /* Can't use ASSERT here as that will cause us to be invoked again.
+        * Possibly resulting in infinite recursion.
+        */
+        assert(str != NULL && "Empty string sent to debug callback");
+
+        // For non-debug builds
+        if (message.isEmpty())
+        {
+            return;
+        }
+
+        // Push this message on the message list
+        const char *last = &str[strlen(str)];
+        dbgMessages.push_back(std::vector<char>(str, last));
+
+        // Ensure the message list's maximum size is maintained
+        while (dbgMessages.size() > max_debug_messages)
+        {
+            dbgMessages.pop_front();
+        }
+    }
+};
 
 static void dumpstr(const DumpFileHandle file, const char * const str, std::size_t const size)
 {
@@ -93,38 +124,10 @@ static void dumpstr(const DumpFileHandle file, const char * const str)
 
 static void dumpEOL(const DumpFileHandle file)
 {
-	dumpstr(file, endl);
+	dumpstr(file, dump_endl);
 }
 
-static void debug_exceptionhandler_data(void **, const char * const str)
-{
-	/* Can't use ASSERT here as that will cause us to be invoked again.
-	 * Possibly resulting in infinite recursion.
-	 */
-	assert(str != NULL && "Empty string sent to debug callback");
 
-	// For non-debug builds
-	if (str == NULL)
-		return;
-
-	// Push this message on the message list
-	const char * last = &str[strlen(str)];
-
-	// Strip finishing newlines
-	while (last != str
-	    && *(last - 1) == '\n')
-	{
-		--last;
-	}
-
-	dbgMessages.push_back(std::vector<char>(str, last));
-
-	// Ensure the message list's maximum size is maintained
-	while (dbgMessages.size() > max_debug_messages)
-	{
-		dbgMessages.pop_front();
-	}
-}
 
 void dbgDumpHeader(DumpFileHandle file)
 {
@@ -226,14 +229,14 @@ static std::string getSysinfo()
 	std::ostringstream os;
 
 	if (uname(&sysInfo) != 0)
-		os << "System information may be invalid!" << endl
-		   << endl;
+		os << "System information may be invalid!" << dump_endl
+		   << dump_endl;
 
-	os << "Operating system: " << sysInfo.sysname  << endl
-	   << "Node name: "        << sysInfo.nodename << endl
-	   << "Release: "          << sysInfo.release  << endl
-	   << "Version: "          << sysInfo.version  << endl
-	   << "Machine: "          << sysInfo.machine  << endl;
+	os << "Operating system: " << sysInfo.sysname  << dump_endl
+	   << "Node name: "        << sysInfo.nodename << dump_endl
+	   << "Release: "          << sysInfo.release  << dump_endl
+	   << "Version: "          << sysInfo.version  << dump_endl
+	   << "Machine: "          << sysInfo.machine  << dump_endl;
 
 	return os.str();
 #endif
@@ -279,7 +282,7 @@ static void createHeader(int const argc, const char** argv, const char *packageV
 {
 	std::ostringstream os;
 
-	os << "Program: "     << getProgramPath(argv[0]) << "(" PACKAGE ")" << endl
+	os << "Program: "     << getProgramPath(argv[0]) << "(" PACKAGE ")" << dump_endl
 	   << "Command line: ";
 
 	/* Dump all command line arguments surrounded by double quotes and
@@ -288,41 +291,41 @@ static void createHeader(int const argc, const char** argv, const char *packageV
 	for (int i = 0; i < argc; ++i)
 		os << "\"" << argv[i] << "\" ";
 
-	os << endl;
+	os << dump_endl;
 
-	os << "Version: "     << packageVersion << endl
-	   << "Distributor: " PACKAGE_DISTRIBUTOR << endl
-	   << "Compiled on: " __DATE__ " " __TIME__ << endl
+	os << "Version: "     << packageVersion << dump_endl
+	   << "Distributor: " PACKAGE_DISTRIBUTOR << dump_endl
+	   << "Compiled on: " __DATE__ " " __TIME__ << dump_endl
 	   << "Compiled by: "
 #if defined(WZ_CC_GNU) && !defined(WZ_CC_INTEL)
-	       << "GCC " __VERSION__ << endl
+	       << "GCC " __VERSION__ << dump_endl
 #elif defined(WZ_CC_INTEL)
 	// Intel includes the compiler name within the version string
-	       << __VERSION__ << endl
+	       << __VERSION__ << dump_endl
 #else
-	       << "UNKNOWN" << endl
+	       << "UNKNOWN" << dump_endl
 #endif
 	   << "Compiled mode: "
 #ifdef DEBUG
-			<< "Debug build" << endl
+			<< "Debug build" << dump_endl
 #else
-			<< "Release build" << endl
+			<< "Release build" << dump_endl
 #endif
-	   << "Executed on: " << getCurTime() << endl
-	   << getSysinfo() << endl
-	   << "Pointers: " << (sizeof(void*) * CHAR_BIT) << "bit" << endl
-	   << endl;
+	   << "Executed on: " << getCurTime() << dump_endl
+	   << getSysinfo() << dump_endl
+	   << "Pointers: " << (sizeof(void*) * CHAR_BIT) << "bit" << dump_endl
+	   << dump_endl;
 
 	PHYSFS_Version physfs_version;
 
 	// Determine PhysicsFS compile time version
 	PHYSFS_VERSION(&physfs_version)
-	os << "Compiled against PhysicsFS version: " << physfs_version << endl;
+	os << "Compiled against PhysicsFS version: " << physfs_version << dump_endl;
 
 	// Determine PhysicsFS runtime version
 	PHYSFS_getLinkedVersion(&physfs_version);
-	os << "Running with PhysicsFS version: " << physfs_version << endl
-	   << endl;
+	os << "Running with PhysicsFS version: " << physfs_version << dump_endl
+	   << dump_endl;
 
 	dbgHeader = strdup(os.str().c_str());
 	if (dbgHeader == NULL)
@@ -344,7 +347,7 @@ void addDumpInfo(const char *inbuffer)
 
 	// add timestamp to all strings
 	std::ostringstream os;
-	os << "[" << ourtime << "]" << inbuffer << endl;
+	os << "[" << ourtime << "]" << inbuffer << dump_endl;
 
 	// Append message to miscData
 	string msg(os.str());
@@ -353,6 +356,7 @@ void addDumpInfo(const char *inbuffer)
 
 void dbgDumpInit(int argc, const char** argv, const char *packageVersion)
 {
-	debug_register_callback(&debug_exceptionhandler_data, NULL, NULL, NULL );
+    LoggerDestination* dest = new LoggerDumpListener();
+	Logger::instance().addDestination(dest);
 	createHeader(argc, argv, packageVersion);
 }

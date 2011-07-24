@@ -30,8 +30,9 @@
 #include <stdio.h>
 #include <time.h>
 #include "string_ext.h"
-#include "lib/framework/wzapp_c.h"
 #include "lib/gamelib/gtime.h"
+
+#include "logger.h"
 
 extern void NotifyUserOfError(char *);		// will throw up a notifier on error
 
@@ -40,186 +41,39 @@ extern void NotifyUserOfError(char *);		// will throw up a notifier on error
 char last_called_script_event[MAX_EVENT_NAME_LEN];
 UDWORD traceID = -1;
 
-static debug_callback * callbackRegistry = NULL;
-bool enabled_debug[LOG_LAST]; // global
 #ifdef DEBUG
 bool assertEnabled = true;
 #else
 bool assertEnabled = false;
 #endif
-#ifdef WZ_OS_MAC
-#include "cocoa_wrapper.h"
-#endif
-/*
- * This list _must_ match the enum in debug.h!
- * Names must be 8 chars long at max!
- */
-static const char *code_part_names[] = {
-	"all",
-	"main",
-	"sound",
-	"video",
-	"wz",
-	"3d",
-	"texture",
-	"net",
-	"memory",
-	"warning",
-	"error",
-	"never",
-	"script",
-	"movement",
-	"attack",
-	"fog",
-	"sensor",
-	"gui",
-	"map",
-	"save",
-	"sync",
-	"death",
-	"life",
-	"gateway",
-	"message",
-	"info",
-	"terrain",
-	"feature",
-	"fatal",
-	"input",
-	"popup",
-	"console",
-	"lobby",
-	"last"
-};
 
-static char inputBuffer[2][MAX_LEN_LOG_LINE];
-static bool useInputBuffer1 = false;
-static bool debug_flush_stderr = false;
+const int LOG_MAIN = Logger::instance().addLoggingLevel("main", false);
+const int LOG_SOUND = Logger::instance().addLoggingLevel("sound", false);
+const int LOG_VIDEO = Logger::instance().addLoggingLevel("video", false);
+const int LOG_WZ = Logger::instance().addLoggingLevel("wz", false);
+const int LOG_3D = Logger::instance().addLoggingLevel("3d", false);
+const int LOG_TEXTURE = Logger::instance().addLoggingLevel("texture", false);
+const int LOG_NET = Logger::instance().addLoggingLevel("net", false);
+const int LOG_MEMORY = Logger::instance().addLoggingLevel("memory", false);
+const int LOG_SCRIPT = Logger::instance().addLoggingLevel("script", false);
+const int LOG_MOVEMENT = Logger::instance().addLoggingLevel("movement", false);
+const int LOG_ATTACK = Logger::instance().addLoggingLevel("attack", false);
+const int LOG_FOG = Logger::instance().addLoggingLevel("fog", false);
+const int LOG_SENSOR = Logger::instance().addLoggingLevel("sensor", false);
+const int LOG_GUI = Logger::instance().addLoggingLevel("gui", false);
+const int LOG_MAP = Logger::instance().addLoggingLevel("map", false);
+const int LOG_SAVE = Logger::instance().addLoggingLevel("save", false);
+const int LOG_SYNC = Logger::instance().addLoggingLevel("sync", false);
+const int LOG_DEATH = Logger::instance().addLoggingLevel("death", false);
+const int LOG_LIFE = Logger::instance().addLoggingLevel("life", false);
+const int LOG_GATEWAY = Logger::instance().addLoggingLevel("gateway", false);
+const int LOG_MSG = Logger::instance().addLoggingLevel("msg", false);
+const int LOG_TERRAIN = Logger::instance().addLoggingLevel("terrain", false);
+const int LOG_FEATURE = Logger::instance().addLoggingLevel("feature", false);
+const int LOG_INPUT = Logger::instance().addLoggingLevel("input", false);
+const int LOG_CONSOLE = Logger::instance().addLoggingLevel("console", false);
+const int LOG_LOBBY = Logger::instance().addLoggingLevel("lobby", false);
 
-/**
- * Convert code_part names to enum. Case insensitive.
- *
- * \return	Codepart number or LOG_LAST if can't match.
- */
-static code_part code_part_from_str(const char *str)
-{
-	unsigned int i;
-
-	for (i = 0; i < LOG_LAST; i++) {
-		if (strcasecmp(code_part_names[i], str) == 0) {
-			return (code_part)i;
-		}
-	}
-	return LOG_LAST;
-}
-
-
-/**
- * Callback for outputing to stderr
- *
- * \param	data			Ignored. Use NULL.
- * \param	outputBuffer	Buffer containing the preprocessed text to output.
- */
-void debug_callback_stderr( WZ_DECL_UNUSED void ** data, const char * outputBuffer )
-{
-	if ( outputBuffer[strlen(outputBuffer) - 1] != '\n' ) {
-		fprintf( stderr, "%s\n", outputBuffer );
-	} else {
-		fprintf( stderr, "%s", outputBuffer );
-	}
-
-	// Make sure that all output is flushed to stderr when requested by the user
-	if (debug_flush_stderr)
-	{
-		fflush(stderr);
-	}
-}
-
-
-/**
- * Callback for outputting to a win32 debugger
- *
- * \param	data			Ignored. Use NULL.
- * \param	outputBuffer	Buffer containing the preprocessed text to output.
- */
-#if defined WIN32 && defined DEBUG
-void debug_callback_win32debug(WZ_DECL_UNUSED void ** data, const char * outputBuffer)
-{
-	char tmpStr[MAX_LEN_LOG_LINE];
-
-	sstrcpy(tmpStr, outputBuffer);
-	if (!strchr(tmpStr, '\n'))
-	{
-		sstrcat(tmpStr, "\n");
-	}
-
-	OutputDebugStringA( tmpStr );
-}
-#endif // WIN32
-
-
-/**
- * Callback for outputing to a file
- *
- * \param	data			Filehandle to output to.
- * \param	outputBuffer	Buffer containing the preprocessed text to output.
- */
-void debug_callback_file( void ** data, const char * outputBuffer )
-{
-	FILE * logfile = (FILE*)*data;
-
-	if ( !strchr( outputBuffer, '\n' ) ) {
-		fprintf( logfile, "%s\n", outputBuffer );
-	} else {
-		fprintf( logfile, "%s", outputBuffer );
-	}
-}
-
-
-/**
- * Setup the file callback
- *
- * Sets data to the filehandle opened for the filename found in data.
- *
- * \param[in,out]	data	In: 	The filename to output to.
- * 							Out:	The filehandle.
- */
-bool debug_callback_file_init(void ** data)
-{
-	const char * filename = (const char *)*data;
-
-	FILE* const logfile = fopen(filename, "w");
-	if (!logfile)
-	{
-		fprintf(stderr, "Could not open %s for appending!\n", filename);
-		return false;
-	}
-
-	setbuf(logfile, NULL);
-	fprintf(logfile, "\n--- Starting log ---\n");
-	*data = logfile;
-
-	return true;
-}
-
-
-/**
- * Shutdown the file callback
- *
- * Closes the logfile.
- *
- * \param	data	The filehandle to close.
- */
-void debug_callback_file_exit( void ** data )
-{
-	FILE * logfile = (FILE*)*data;
-	fclose( logfile );
-	*data = NULL;
-}
-
-void debugFlushStderr()
-{
-	debug_flush_stderr = true;
-}
 // MSVC specific rotuines to set/clear allocation tracking
 #if defined(WZ_CC_MSVC) && defined(DEBUG)
 void debug_MEMCHKOFF(void)
@@ -260,97 +114,48 @@ void debug_init(void)
 	_CrtSetDbgFlag( tmpDbgFlag );
 #endif // WZ_CC_MSVC && DEBUG
 
-	STATIC_ASSERT(ARRAY_SIZE(code_part_names) - 1 == LOG_LAST); // enums start at 0
+    LoggerDestination* debugDestination = new LoggerDebugOutputDestination();
+    Logger::instance().addDestination(debugDestination);
 
-	memset( enabled_debug, false, sizeof(enabled_debug) );
-	enabled_debug[LOG_ERROR] = true;
-	enabled_debug[LOG_INFO] = true;
-	enabled_debug[LOG_FATAL] = true;
-	enabled_debug[LOG_POPUP] = true;
-	inputBuffer[0][0] = '\0';
-	inputBuffer[1][0] = '\0';
+#if defined(Q_OS_WIN) && defined(DEBUG_INSANE)
+    debugDestination = new LoggerWinDebugDestition();
+    Logger::instance().addDestination(debugDestination);
+#endif // WZ_OS_WIN && DEBUG_INSANE
+
+    Logger::instance().setPopupTitleBody("Warzone has detected a problem.",
+                                         "A non fatal error has occurred.\n\n%1\n\n");
+
+#if defined(WZ_OS_WIN)
+    Logger::instance().setFatalTitleBody(
+        "Warzone has terminated unexpectedly",
+        "%1\n\nPlease check your stderr.txt file in the same directory as the program file for more details. \
+        \nDo not forget to upload both the stderr.txt file and the warzone2100.rpt file in your bug reports!");
+#elif defined(WZ_OS_MAC)
+    Logger::instance().setFatalTitleBody(
+        "Warzone has terminated unexpectedly",
+        "%1\n\nPlease check your logs for more details."
+        "\n\nRun Console.app, search for \"wz2100\", and copy that to a file."
+        "\n\nIf you are on 10.4 (Tiger) or 10.5 (Leopard) the crash report"
+        " is in ~/Library/Logs/CrashReporter."
+        " If you are on 10.6 (Snow Leopard), it is in"
+        "\n~/Library/Logs/DiagnosticReports."
+        "\n\nDo not forget to upload and attach those to a bug report at http://developer.wz2100.net/newticket"
+        "\nThanks!");
+#else
+    Logger::instance().setFatalTitleBody(
+        "Warzone has terminated unexpectedly",
+        "%1\n\nPlease check your logs for more details.");
+#endif
+
 #ifdef DEBUG
-	enabled_debug[LOG_WARNING] = true;
+    Logger::instance().setLevelStatus(LOG_WARNING, true);
 #endif
 }
 
 
 void debug_exit(void)
 {
-	debug_callback * curCallback = callbackRegistry, * tmpCallback = NULL;
-
-	while ( curCallback )
-	{
-		if ( curCallback->exit )
-			curCallback->exit( &curCallback->data );
-		tmpCallback = curCallback->next;
-		free( curCallback );
-		curCallback = tmpCallback;
-	}
-
-	callbackRegistry = NULL;
-}
-
-
-void debug_register_callback( debug_callback_fn callback, debug_callback_init init, debug_callback_exit exit, void * data )
-{
-	debug_callback * curCallback = callbackRegistry, * tmpCallback = NULL;
-
-	tmpCallback = (debug_callback*)malloc(sizeof(*tmpCallback));
-
-	tmpCallback->next = NULL;
-	tmpCallback->callback = callback;
-	tmpCallback->init = init;
-	tmpCallback->exit = exit;
-	tmpCallback->data = data;
-
-	if (tmpCallback->init
-	 && !tmpCallback->init(&tmpCallback->data))
-	{
-		debug(LOG_ERROR, "Failed to initialise debug callback");
-		free(tmpCallback);
-		return;
-	}
-
-	if ( !curCallback )
-	{
-		callbackRegistry = tmpCallback;
-		return;
-	}
-
-	while ( curCallback->next )
-		curCallback = curCallback->next;
-
-	curCallback->next = tmpCallback;
-}
-
-
-bool debug_enable_switch(const char *str)
-{
-	code_part part = code_part_from_str(str);
-
-	if (part != LOG_LAST) {
-		enabled_debug[part] = !enabled_debug[part];
-	}
-	if (part == LOG_ALL) {
-		memset(enabled_debug, true, sizeof(enabled_debug));
-	}
-	return (part != LOG_LAST);
-}
-
-/** Send the given string to all debug callbacks.
- *
- *  @param str The string to send to debug callbacks.
- */
-static void printToDebugCallbacks(const char * const str)
-{
-	debug_callback * curCallback;
-
-	// Loop over all callbacks, invoking them with the given data string
-	for (curCallback = callbackRegistry; curCallback != NULL; curCallback = curCallback->next)
-	{
-		curCallback->callback(&curCallback->data, str);
-	}
+    // FIXME: add unloading code to the logger.
 }
 
 void _realObjTrace(int id, const char *function, const char *str, ...)
@@ -364,123 +169,10 @@ void _realObjTrace(int id, const char *function, const char *str, ...)
 	va_end(ap);
 
 	ssprintf(outputBuffer, "[%6d]: [%s] %s", id, function, vaBuffer);
-	printToDebugCallbacks(outputBuffer);
+    Logger::instance().write(outputBuffer);
 }
 
-void _debug( code_part part, const char *function, const char *str, ... )
-{
-	va_list ap;
-	static char outputBuffer[MAX_LEN_LOG_LINE];
-	static unsigned int repeated = 0; /* times current message repeated */
-	static unsigned int next = 2;     /* next total to print update */
-	static unsigned int prev = 0;     /* total on last update */
 
-	va_start(ap, str);
-	vssprintf(outputBuffer, str, ap);
-	va_end(ap);
-
-	ssprintf(inputBuffer[useInputBuffer1 ? 1 : 0], "[%s] %s", function, outputBuffer);
-
-	if (sstrcmp(inputBuffer[0], inputBuffer[1]) == 0)
-	{
-		// Received again the same line
-		repeated++;
-		if (repeated == next) {
-			if (repeated > 2) {
-				ssprintf(outputBuffer, "last message repeated %u times (total %u repeats)", repeated - prev, repeated);
-			} else {
-				ssprintf(outputBuffer, "last message repeated %u times", repeated - prev);
-			}
-			printToDebugCallbacks(outputBuffer);
-			prev = repeated;
-			next *= 2;
-		}
-	} else {
-		// Received another line, cleanup the old
-		if (repeated > 0 && repeated != prev && repeated != 1) {
-			/* just repeat the previous message when only one repeat occurred */
-			if (repeated > 2) {
-				ssprintf(outputBuffer, "last message repeated %u times (total %u repeats)", repeated - prev, repeated);
-			} else {
-				ssprintf(outputBuffer, "last message repeated %u times", repeated - prev);
-			}
-			printToDebugCallbacks(outputBuffer);
-		}
-		repeated = 0;
-		next = 2;
-		prev = 0;
-	}
-
-	if (!repeated)
-	{
-		time_t rawtime;
-		struct tm * timeinfo;
-		char ourtime[15];		//HH:MM:SS
-
-		time ( &rawtime );
-		timeinfo = localtime ( &rawtime );
-		strftime (ourtime,15,"%I:%M:%S",timeinfo);
-
-		// Assemble the outputBuffer:
-		ssprintf(outputBuffer, "%-8s|%s: %s", code_part_names[part], ourtime, useInputBuffer1 ? inputBuffer[1] : inputBuffer[0]);
-
-		printToDebugCallbacks(outputBuffer);
-
-		if (part == LOG_ERROR)
-		{
-			// used to signal user that there was a error condition, and to check the logs.
-			NotifyUserOfError(useInputBuffer1 ? inputBuffer[1] : inputBuffer[0]);
-		}
-
-		// Throw up a dialog box for users since most don't have a clue to check the dump file for information. Use for (duh) Fatal errors, that force us to terminate the game.
-		if (part == LOG_FATAL)
-		{
-#if defined(WZ_OS_WIN)
-			char wbuf[512];
-			ssprintf(wbuf, "%s\n\nPlease check your stderr.txt file in the same directory as the program file for more details. \
-				\nDo not forget to upload both the stderr.txt file and the warzone2100.rpt file in your bug reports!", useInputBuffer1 ? inputBuffer[1] : inputBuffer[0]);
-			MessageBoxA( NULL,
-				wbuf,
-				"Warzone has terminated unexpectedly", MB_OK|MB_ICONERROR);
-#elif defined(WZ_OS_MAC)
-			cocoaShowAlert("Warzone has terminated unexpectedly.",
-			               "Please check your logs for more details."
-			               "\n\nRun Console.app, search for \"wz2100\", and copy that to a file."
-			               "\n\nIf you are on 10.4 (Tiger) or 10.5 (Leopard) the crash report"
-			               " is in ~/Library/Logs/CrashReporter."
-			               " If you are on 10.6 (Snow Leopard), it is in"
-			               "\n~/Library/Logs/DiagnosticReports."
-			               "\n\nDo not forget to upload and attach those to a bug report at http://developer.wz2100.net/newticket"
-			               "\nThanks!", 2);
-#else
-			const char* popupBuf = useInputBuffer1 ? inputBuffer[1] : inputBuffer[0];
-			wzFatalDialog(popupBuf);
-#endif
-		}
-
-		// Throw up a dialog box for windows users since most don't have a clue to check the stderr.txt file for information
-		// This is a popup dialog used for times when the error isn't fatal, but we still need to notify user what is going on.
-		if (part == LOG_POPUP)
-		{
-#if defined(WZ_OS_WIN)
-			char wbuf[512];
-			ssprintf(wbuf, "A non fatal error has occurred.\n\n%s\n\n", useInputBuffer1 ? inputBuffer[1] : inputBuffer[0]);
-			MessageBoxA( NULL,
-				wbuf,
-				"Warzone has detected a problem.", MB_OK|MB_ICONINFORMATION);
-#elif defined(WZ_OS_MAC)
-			cocoaShowAlert("Warzone has detected a problem.", inputBuffer[useInputBuffer1 ? 1 : 0], 0);
-#endif
-		}
-
-	}
-	useInputBuffer1 = !useInputBuffer1; // Swap buffers
-}
-
-bool debugPartEnabled(code_part codePart)
-{
-	return enabled_debug[codePart];
-}
 
 void debugDisableAssert()
 {

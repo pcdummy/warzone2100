@@ -158,9 +158,6 @@ inline QAbstractFileEngine *PhysicsEngineHandler::create(const QString &fileName
 	return NULL;
 }
 
-extern void debug_callback_stderr( void**, const char * );
-extern void debug_callback_win32debug( void**, const char * );
-
 static bool inList( char * list[], const char * item )
 {
 	int i = 0;
@@ -1103,15 +1100,11 @@ int main(int argc, char *argv[])
 #endif
 
 	debug_init();
-	debug_register_callback( debug_callback_stderr, NULL, NULL, NULL );
-#if defined(WZ_OS_WIN) && defined(DEBUG_INSANE)
-	debug_register_callback( debug_callback_win32debug, NULL, NULL, NULL );
-#endif // WZ_OS_WIN && DEBUG_INSANE
 
 	// *****
 	// NOTE: Try *NOT* to use debug() output routines without some other method of informing the user.  All this output is sent to /dev/nul at this point on some platforms!
 	// *****
-	if (!getUTF8CmdLine(&utfargc, &utfargv))
+    if (!getUTF8CmdLine(&utfargc, &utfargv))
 	{
 		return EXIT_FAILURE;
 	}
@@ -1157,11 +1150,10 @@ int main(int argc, char *argv[])
 
 		time( &aclock );					// Get time in seconds
 		newtime = localtime( &aclock );		// Convert time to struct
-		// Note: We are using fopen(), and not physfs routines to open the file
-		// log name is logs/(or \)WZlog-MMDD_HHMMSS.txt
 		snprintf(buf, sizeof(buf), "%slogs%sWZlog-%02d%02d_%02d%02d%02d.txt", PHYSFS_getWriteDir(), PHYSFS_getDirSeparator(),
 			newtime->tm_mon, newtime->tm_mday, newtime->tm_hour, newtime->tm_min, newtime->tm_sec );
-		debug_register_callback( debug_callback_file, debug_callback_file_init, debug_callback_file_exit, buf );
+        LoggerDestination* fileDest = new LoggerFileDestination(buf);
+        Logger::instance().addDestination(fileDest);
 	}
 
 	// NOTE: it is now safe to use debug() calls to make sure output gets captured.
@@ -1204,7 +1196,7 @@ int main(int argc, char *argv[])
 	// strange conflicts - Per
 	if (selfTest)
 	{
-		memset(enabled_debug, 0, sizeof(*enabled_debug) * LOG_LAST);
+		Logger::instance().setLevelStatus(LOG_ALL, false);
 		fprintf(stdout, "Carrying out self-test:\n");
 		playListTest();
 		audioTest();

@@ -28,16 +28,4 @@ void cocoaInit()
 	NSApplicationLoad();
 }
 
-void cocoaShowAlert(const char *message, const char *information, unsigned style)
-{
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	NSAlert *alert = [[NSAlert alloc] init];
-	[alert addButtonWithTitle:@"OK"];
-	[alert setMessageText:[NSString stringWithUTF8String:message]];
-	[alert setInformativeText:[NSString stringWithUTF8String:information]];
-	[alert setAlertStyle:style];
-	[alert runModal];
-	[pool release];
-}
-
 #endif // WZ_OS_MAC

@@ -27,15 +27,6 @@
 
 void cocoaInit(void);
 
-/*!
- * Display an alert dialog.
- * This blocks until the dialog is dismissed.
- * \param message Summary of the issue
- * \param information A more detailed explanation of the issue
- * \param style 0 is a warning, 1 is informational, and 2 is critical. (NSAlertStyle)
- */
-void cocoaShowAlert(const char *message, const char *information, unsigned style);
-
 #endif // WZ_OS_MAC
 
 #endif // __INCLUDED_LIB_FRAMEWORK_COCOA_WRAPPER_H__

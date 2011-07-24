@@ -32,6 +32,7 @@
 #endif
 
 #include "wzglobal.h"
+#include "logger.h"
 
 #include <assert.h>
 #if !defined(WZ_OS_WIN)
@@ -66,16 +67,16 @@ extern bool assertEnabled;
 /** Deals with failure in an assert. Expression is (re-)evaluated for output in the assert() call. */
 #define ASSERT_FAILURE(expr, expr_string, location_description, function, ...) \
 	( \
-		(void)_debug(LOG_INFO, function, __VA_ARGS__), \
-		(void)_debug(LOG_INFO, function, "Assert in Warzone: %s (%s), last script event: '%s'", \
+		(void)Logger::Helper(LOG_INFO, __func__).sprintfMe(__VA_ARGS__), \
+		(void)Logger::Helper(LOG_INFO, function).sprintfMe("Assert in Warzone: %s (%s), last script event: '%s'", \
 	                                  location_description, expr_string, last_called_script_event), \
 		( assertEnabled ? (void)wz_assert(expr) : (void)0 )\
 	)
 
 /**
  * Internal assert helper macro to allow some debug functions to use an alternate calling location.
- * Expression is only evaluated once if true, if false it is evaluated another time to provide decent 
- * feedback on OSes that have good GUI facilities for asserts and lousy backtrace facilities. 
+ * Expression is only evaluated once if true, if false it is evaluated another time to provide decent
+ * feedback on OSes that have good GUI facilities for asserts and lousy backtrace facilities.
  *
  * \param expr                 Expression to assert on.
  * \param location_description A string describing the calling location, e.g.:
@@ -145,60 +146,33 @@ template<> class StaticAssert<true>{};
  ***  by similar code in Freeciv. Parts ripped directly.
  ***
  ***/
-
-/** Debug enums. Must match code_part_names in debug.c */
-enum code_part
-{
-  LOG_ALL, /* special: sets all to on */
-  LOG_MAIN,
-  LOG_SOUND,
-  LOG_VIDEO,
-  LOG_WZ,
-  LOG_3D,
-  LOG_TEXTURE,
-  LOG_NET,
-  LOG_MEMORY,
-  LOG_WARNING, /**< special; on in debug mode */
-  LOG_ERROR, /**< special; on by default */
-  LOG_NEVER, /**< if too verbose for anything but dedicated debugging... */
-  LOG_SCRIPT,
-  LOG_MOVEMENT,
-  LOG_ATTACK,
-  LOG_FOG,
-  LOG_SENSOR,
-  LOG_GUI,
-  LOG_MAP,
-  LOG_SAVE,
-  LOG_SYNC,
-  LOG_DEATH,
-  LOG_LIFE,
-  LOG_GATEWAY,
-  LOG_MSG,
-  LOG_INFO, /**< special; on by default, for both debug & release builds */
-  LOG_TERRAIN,
-  LOG_FEATURE,
-  LOG_FATAL,	/**< special; on by default, for both debug & release builds  */
-  LOG_INPUT,	// mouse / keyboard events
-  LOG_POPUP,	// special, on by default, for both debug & release builds (used for OS dependent popup code)
-  LOG_CONSOLE,	// send console messages to file
-  LOG_LOBBY,
-  LOG_LAST /**< _must_ be last! */
-};
-
-extern bool enabled_debug[LOG_LAST];
-
-typedef void (*debug_callback_fn)(void**, const char*);
-typedef bool (*debug_callback_init)(void**);
-typedef void (*debug_callback_exit)(void**);
-
-struct debug_callback
-{
-	debug_callback * next;
-	debug_callback_fn callback; /// Function which does the output
-	debug_callback_init init; /// Setup function
-	debug_callback_exit exit; /// Cleaning function
-	void * data; /// Used to pass data to the above functions. Eg a filename or handle.
-};
+extern const int LOG_MAIN;
+extern const int LOG_SOUND;
+extern const int LOG_VIDEO;
+extern const int LOG_WZ;
+extern const int LOG_3D;
+extern const int LOG_TEXTURE;
+extern const int LOG_NET;
+extern const int LOG_MEMORY;
+extern const int LOG_SCRIPT;
+extern const int LOG_MOVEMENT;
+extern const int LOG_ATTACK;
+extern const int LOG_FOG;
+extern const int LOG_SENSOR;
+extern const int LOG_GUI;
+extern const int LOG_MAP;
+extern const int LOG_SAVE;
+extern const int LOG_SYNC;
+extern const int LOG_DEATH;
+extern const int LOG_LIFE;
+extern const int LOG_GATEWAY;
+extern const int LOG_MSG;
+extern const int LOG_TERRAIN;
+extern const int LOG_FEATURE;
+extern const int LOG_INPUT;
+extern const int LOG_CONSOLE;
+extern const int LOG_LOBBY;
+extern const int LOG_LAST;
 
 /**
  * Call once to initialize the debug logging system.
@@ -212,49 +186,21 @@ void debug_init( void );
  */
 void debug_exit( void );
 
-/**
- * Have the stderr output callback flush its output before returning.
- *
- * NOTE: This may cause significant slowdowns on some systems.
- */
-extern void debugFlushStderr(void);
-
-/**
- * Register a callback to be called on every call to debug()
- *
- * \param	callback	Function which does the output
- * \param	init		Initializer function which does all setup for the callback (optional, may be NULL)
- * \param	exit		Cleanup function called when unregistering the callback (optional, may be NULL)
- * \param	data		Data to be passed to all three functions (optional, may be NULL)
- */
-void debug_register_callback( debug_callback_fn callback, debug_callback_init init, debug_callback_exit exit, void * data );
-
-void debug_callback_file(void **data, const char *outputBuffer);
-bool debug_callback_file_init(void **data);
-void debug_callback_file_exit(void **data);
-
-void debug_callback_stderr(void **data, const char *outputBuffer);
-
-#if defined WIN32 && defined DEBUG
-void debug_callback_win32debug(void** data, const char* outputBuffer);
-#endif
-
-/**
- * Toggle debug output for part associated with str
- *
- * \param	str	Codepart in textformat
- */
-bool debug_enable_switch(const char *str);
 // macro for always outputting informational responses on both debug & release builds
-#define info(...) do { _debug(LOG_INFO, __FUNCTION__, __VA_ARGS__); } while(0)
+#define info(...) \
+do { if (Logger::instance().checkLevel(LOG_INFO)) Logger::Helper(LOG_INFO, __func__).sprintfMe(__VA_ARGS__); } while(0)
+
 /**
  * Output printf style format str with additional arguments.
  *
  * Only outputs if debugging of part was formerly enabled with debug_enable_switch.
  */
-#define debug(part, ...) do { if (enabled_debug[part]) _debug(part, __FUNCTION__, __VA_ARGS__); } while(0)
-void _debug( code_part part, const char *function, const char *str, ...)
-		WZ_DECL_FORMAT(printf, 3, 4);
+#define debug(level, ...) \
+do { if (Logger::instance().checkLevel(level)) Logger::Helper(level, __func__).sprintfMe(__VA_ARGS__); } while(0)
+
+#define wzLog(level) \
+if (!Logger::instance().checkLevel(level)){} \
+else Logger::Helper(level, __func__).stream()
 
 /** Global to keep track of which game object to trace. */
 extern UDWORD traceID;
@@ -277,7 +223,7 @@ void debug_MEMSTATS(void);
 #endif
 
 /** Checks if a particular debub flag was enabled */
-extern bool debugPartEnabled(code_part codePart);
+//extern bool debugPartEnabled(code_part codePart);
 
 void debugDisableAssert(void);
 

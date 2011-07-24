@@ -81,8 +81,9 @@ static void eventPrintTriggerInfo(ACTIVE_TRIGGER *psTrigger)
 // event tracing printf
 #ifdef DEBUG
 #define DB_TRACE(x, level) \
-	if (eventTraceLevel >= (level)) \
-		debug(LOG_SCRIPT, x)
+	if (eventTraceLevel >= (level)) { \
+		debug(LOG_SCRIPT, x); \
+	}
 #else
 #define DB_TRACE(x,level)
 #endif
@@ -265,7 +266,7 @@ const char *eventGetEventID(SCRIPT_CODE *psCode, SDWORD event)
 	SDWORD			i;
 
 	// skip if not debugging scripts
-	if(!debugPartEnabled(LOG_SCRIPT))
+	if(!Logger::instance().checkLevel(LOG_SCRIPT))
 	{
 		pID = "N/A";
 		return pID;

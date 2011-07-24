@@ -163,24 +163,29 @@ static bool bCurCallerIsEvent = false;
 #define TRCPRINTF(...) do { if (interpTrace) { fprintf( stderr, __VA_ARGS__ ); } } while (false)
 
 #define TRCPRINTVAL(x) \
-	if (interpTrace) \
-		cpPrintVal(x)
+	if (interpTrace) {\
+		cpPrintVal(x); \
+    }
 
 #define TRCPRINTOPCODE(x) \
-	if (interpTrace) \
-		debug( LOG_NEVER, "%s", scriptOpcodeToString((OPCODE)x) )
+	if (interpTrace) { \
+		debug( LOG_NEVER, "%s", scriptOpcodeToString((OPCODE)x) ); \
+	}
 
 #define TRCPRINTSTACKTOP() \
-	if (interpTrace) \
-		stackPrintTop()
+	if (interpTrace) { \
+		stackPrintTop(); \
+	}
 
 #define TRCPRINTFUNC(x) \
-	if (interpTrace) \
-		debug( LOG_NEVER, "%s", scriptFunctionToString(x) )
+	if (interpTrace) { \
+		debug( LOG_NEVER, "%s", scriptFunctionToString(x) ); \
+	}
 
 #define TRCPRINTVARFUNC(x, data) \
-	if (interpTrace) \
-		cpPrintVarFunc(x, data)
+	if (interpTrace) { \
+		cpPrintVarFunc(x, data); \
+	}
 
 
 // true if the interpreter is currently running
@@ -1097,7 +1102,7 @@ static bool retStackPop(UDWORD *CallerIndex, INTERP_VAL **ReturnAddress)
 
 
 /* Output script call stack trace */
-void scrOutputCallTrace(code_part part)
+void scrOutputCallTrace(int part)
 {
 	SDWORD i;
 	const char *pEvent;

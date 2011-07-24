@@ -57,6 +57,8 @@ noinst_HEADERS = \
 	input.h \
 	lexer_input.h \
 	listmacs.h \
+	logger.h \
+	loggerdest.h \
 	math_ext.h \
 	opengl.h \
 	physfs_ext.h \
@@ -92,6 +94,8 @@ libframework_a_SOURCES = \
 	geometry.cpp \
 	i18n.cpp \
 	lexer_input.cpp \
+	logger.cpp \
+	loggerdest.cpp \
 	stdio_ext.cpp \
 	strres.cpp \
 	treap.cpp \

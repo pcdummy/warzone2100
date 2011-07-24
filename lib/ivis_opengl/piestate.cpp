@@ -154,7 +154,7 @@ static char *readShaderBuf(const char *name)
 }
 
 // Retrieve shader compilation errors
-static void printShaderInfoLog(code_part part, GLuint shader)
+static void printShaderInfoLog(int part, GLuint shader)
 {
 	GLint infologLen = 0;
 
@@ -171,7 +171,7 @@ static void printShaderInfoLog(code_part part, GLuint shader)
 }
 
 // Retrieve shader linkage errors
-static void printProgramInfoLog(code_part part, GLuint program)
+static void printProgramInfoLog(int part, GLuint program)
 {
 	GLint infologLen = 0;
 

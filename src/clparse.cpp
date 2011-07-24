@@ -304,7 +304,7 @@ bool ParseCommandLineEarly(int argc, const char** argv)
 	int iOption;
 
 #if defined(WZ_OS_MAC) && defined(DEBUG)
-	debug_enable_switch( "all" );
+	Logger::instance().setLevelStatus(LOG_ALL, true);
 #endif /* WZ_OS_MAC && DEBUG */
 
 	/* loop through command line */
@@ -312,6 +312,8 @@ bool ParseCommandLineEarly(int argc, const char** argv)
 	{
 		CLI_OPTIONS option = (CLI_OPTIONS)iOption;
 		const char* token;
+
+        LoggerDestination* fileDest;
 
 		if (iOption == POPT_ERROR_BADOPT)
 		{
@@ -329,7 +331,7 @@ bool ParseCommandLineEarly(int argc, const char** argv)
 				}
 
 				// Attempt to enable the given debug section
-				if (!debug_enable_switch(token))
+				if (!Logger::instance().setLevelStatus(QString(token).toLower(), true))
 				{
 					qFatal("Debug flag \"%s\" not found!", token);
 				}
@@ -342,13 +344,16 @@ bool ParseCommandLineEarly(int argc, const char** argv)
 				{
 					qFatal("Missing debugfile filename?");
 				}
-				debug_register_callback( debug_callback_file, debug_callback_file_init, debug_callback_file_exit, (void*)token );
+
+				fileDest = new LoggerFileDestination(token);
+                Logger::instance().addDestination(fileDest);
+
 				customDebugfile = true;
 				break;
 
 			case CLI_FLUSHDEBUGSTDERR:
 				// Tell the debug stderr output callback to always flush its output
-				debugFlushStderr();
+				Logger::instance().setAlwaysFlush(true);
 				break;
 
 			case CLI_CONFIGDIR:
