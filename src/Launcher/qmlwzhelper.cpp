@@ -123,3 +123,15 @@ Q_INVOKABLE void QMLWzHelper::setResolution(const QString& resolution)
     config.set("height", res.at(1));
 }
 
+Q_INVOKABLE QString QMLWzHelper::getLanguage()
+{
+    return getLanguageName();
+}
+
+Q_INVOKABLE QString QMLWzHelper::setNextLanguage()
+{
+    ::setNextLanguage();
+    config.set("language", ::getLanguage());
+    return getLanguageName();
+}
+

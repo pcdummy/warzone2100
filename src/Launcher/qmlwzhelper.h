@@ -78,6 +78,9 @@ public:
     Q_INVOKABLE QStringList getAvailableResolutions();
     Q_INVOKABLE void setResolution(const QString &resolution);
 
+    Q_INVOKABLE QString getLanguage();
+    Q_INVOKABLE QString setNextLanguage();
+
 private:
     WzQMLView* m_view;
 };

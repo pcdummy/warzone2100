@@ -97,14 +97,21 @@ Item {
             value: wz.getConfigValue("colour")
             onValueChanged: wz.setConfigValue("colour", value)
         }
-        Widgets.ClickSelect {
-            width: parent.width;
-            options: [wz.tr("System"), "German", "English"]
-            value: {
-                var index = options.indexOf(wz.getConfigValue("language"));
-                (index == -1 ? 0 : index)
+        Widgets.LargeText {
+            id: languageButton
+            width: parent.width
+
+            text: wz.getLanguage()
+
+            MouseArea {
+                anchors.fill: parent
+                hoverEnabled: true
+                onEntered: parent.color = "#ffffff"
+                onExited: parent.color = "#a0a0ff"
+                onClicked: {
+                    languageButton.text = wz.setNextLanguage()
+                }
             }
-            onValueChanged: wz.setConfigValue("language", (value != 0 ? options[value] : ""))
         }
         Widgets.ClickSelect {
             width: parent.width;
