@@ -12,7 +12,7 @@ AM_YFLAGS = -d
 
 version.o: autorevision.h
 
-autorevision.h: $(warzone2100_SOURCES) $(warzone2100_LIBS)
+autorevision.h: $(warzone2100_engine_SOURCES) $(warzone2100_LIBS)
 	(cd $(top_srcdir) && ./build_tools/autorevision.sh $(abs_top_builddir)/src/autorevision.h || true)
 	
 MOCHEADER = wzapp.h
@@ -42,7 +42,7 @@ EXTRA_DIST = \
 	scriptvals_parser.y \
 	level_lexer.l
 
-bin_PROGRAMS = warzone2100
+bin_PROGRAMS = warzone2100-engine
 noinst_HEADERS = \
 	$(MOCHEADER) \
 	wzapp_c.h \
@@ -177,7 +177,7 @@ noinst_HEADERS = \
 	weapondef.h \
 	wrappers.h
 
-warzone2100_SOURCES = \
+warzone2100_engine_SOURCES = \
 	${MOCEDFILES} \
 	wzapp.cpp \
 	action.cpp \
@@ -292,7 +292,7 @@ warzone2100_SOURCES = \
 	wavecast.cpp \
 	wrappers.cpp
 
-warzone2100_LIBS = \
+warzone2100_engine_LIBS = \
 	$(top_builddir)/lib/widget/libwidget.a \
 	$(top_builddir)/lib/qtgame/libqtgame.a \
 	$(top_builddir)/lib/sequence/libsequence.a \
@@ -305,10 +305,10 @@ warzone2100_LIBS = \
 	$(top_builddir)/lib/exceptionhandler/libexceptionhandler.a \
 	$(top_builddir)/3rdparty/miniupnpc/libminiupnpc.a
 
-warzone2100_LDADD = $(warzone2100_LIBS) $(LTLIBINTL) $(PHYSFS_LIBS) $(PNG_LIBS) $(OGGVORBIS_LIBS) \
+warzone2100_engine_LDADD = $(warzone2100_engine_LIBS) $(LTLIBINTL) $(PHYSFS_LIBS) $(PNG_LIBS) $(OGGVORBIS_LIBS) \
 	$(THEORA_LIBS) $(OPENAL_LIBS) $(OPENGLC_LIBS) $(OPENGL_LIBS) $(QT4_LIBS) $(QJSON_LIBS) $(GLEW_LIBS) \
 	$(X_LIBS) $(X_EXTRA_LIBS)
 
 if MINGW32
-warzone2100_LDADD += $(top_builddir)/win32/warzone2100.o $(WIN32_LIBS)
+warzone2100_engine_LDADD += $(top_builddir)/win32/warzone2100.o $(WIN32_LIBS)
 endif

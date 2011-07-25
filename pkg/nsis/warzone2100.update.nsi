@@ -140,8 +140,8 @@ Section $(TEXT_SecBase) SecBase
   ;ADD YOUR OWN FILES HERE...
 
   ; Main executable
-;  File "..\..\src\warzone2100.exe"
-  !insertmacro VPatchFile "warzone2100.exe.vpatch" "$INSTDIR\warzone2100.exe" "$INSTDIR\warzone2100.exe.tmp"
+;  File "..\..\src\warzone2100-engine.exe"
+  !insertmacro VPatchFile "warzone2100-engine.exe.vpatch" "$INSTDIR\warzone2100-engine.exe" "$INSTDIR\warzone2100-engine.exe.tmp"
 
   ; Windows dbghelp library
   File "${EXTDIR}\bin\dbghelp.dll.license.txt"
