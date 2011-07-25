@@ -76,8 +76,10 @@ Q_INVOKABLE int QMLWzHelper::setMap(int techlevel, const QString &name)
         return 0;
     }
     
-    config.set("mapName", entry["name"]);
+    config.set("mapName", name);
     config.set("techlevel", techlevel);
+    config.set("fullMapName", entry["name"]);
+    config.set("mapPath", entry["path"]);
 
     return entry["players"].toInt();
 }

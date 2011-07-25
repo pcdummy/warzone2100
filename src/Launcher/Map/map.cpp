@@ -115,10 +115,10 @@ static void buildMapList()
                 mlSkirmishT1.insert(shortenMapname(i.key()), data);
             break;
             case GAMETYPE_SKIRMISH_T2:
-                mlSkirmishT1.insert(shortenMapname(i.key()), data);
+                mlSkirmishT2.insert(shortenMapname(i.key()), data);
             break;
             case GAMETYPE_SKIRMISH_T3:
-                mlSkirmishT1.insert(shortenMapname(i.key()), data);
+                mlSkirmishT3.insert(shortenMapname(i.key()), data);
             break;
             default:
                 wzLog(LOG_INFO) << QString("Unknown gameType %1 in %2, map %3")
@@ -159,10 +159,10 @@ QVariantMap& getList(GAMETYPES gameType)
             return mlSkirmishT1;
         break;
         case GAMETYPE_SKIRMISH_T2:
-            return mlSkirmishT1;
+            return mlSkirmishT2;
         break;
         case GAMETYPE_SKIRMISH_T3:
-            return mlSkirmishT1;
+            return mlSkirmishT3;
         break;
         default:
             wzLog(LOG_ERROR) << QString("Unknown gameType %1").arg(gameType);
@@ -174,16 +174,10 @@ QVariantMap& getList(GAMETYPES gameType)
 
 bool loadMap(const QString& path)
 {
-    if (path.isEmpty())
-    {
-        return false;
-    }
-
     if (mapLoaded)
     {
         FileSystem::unloadMaps();
     }
-
 
     if (!FileSystem::loadMap(path.toUtf8().constData()))
     {

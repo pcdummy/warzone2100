@@ -27,7 +27,7 @@ Item {
     property variant    _subScreen
 
     Component.onCompleted: {
-        map = wz.getConfigValue("mapName").substr(3)
+        map = wz.getConfigValue("mapName")
         techlevel = wz.getConfigValue("techlevel")
         
         maxPlayers = wz.setMap(techlevel, map)
