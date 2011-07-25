@@ -3,6 +3,9 @@
 *.bak
 .*.swp
 
+# Generated QT moc files
+*_moc.cpp
+
 # Generated binary files:
 *.o
 *.lo
