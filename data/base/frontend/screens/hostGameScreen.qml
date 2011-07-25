@@ -20,6 +20,9 @@ Item {
         id: playersModel
     }
 
+    // Internal: to allow switching in the players screen.
+    property bool       _alliance
+
     // Internal: Indicates that we are in the player screen.
     property bool       _isHosting  :       false
 
@@ -27,6 +30,8 @@ Item {
     property variant    _subScreen
 
     Component.onCompleted: {
+        _alliance = wz.getConfigValue("alliance") == 1 ? true : false
+        
         map = wz.getConfigValue("mapName")
         techlevel = wz.getConfigValue("techlevel")
         
@@ -313,7 +318,10 @@ Item {
                     image3Active: "image://imagemap/button active"
 
                     state: wz.getConfigValue("alliance") + 1
-                    onStateChanged: wz.setConfigValue("alliance", state - 1)
+                    onStateChanged: {
+                        wz.setConfigValue("alliance", state - 1)
+                        state == 2 ? hostGameScreen._alliance = true : false
+                    }
                 }
             }
             Widgets.SingleLineEdit {

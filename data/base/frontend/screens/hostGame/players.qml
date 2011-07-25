@@ -490,7 +490,7 @@ Item {
         id: playersDelegate
 
         Rectangle {
-            width: wz.getConfigValue("alliance") == 2 ? 248 : 217
+            width: hostGameScreen._alliance ? 248 : 217
             height: 38
 
             color: "#000161"
@@ -531,7 +531,7 @@ Item {
                 id: colorflag
                 width: 33; height: parent.height
 
-                anchors.left: wz.getConfigValue("alliance") == 2 ? teamselector.right : parent.left
+                anchors.left: hostGameScreen._alliance ? teamselector.right : parent.left
 
                 color: "#000161"
                 border.color: "#0015f0"
