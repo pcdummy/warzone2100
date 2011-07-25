@@ -30,12 +30,6 @@
 #error Framework header files MUST be included from Frame.h ONLY.
 #endif
 
-/* Initialise the double buffered display */
-extern bool screenInitialise(void);
-
-/* Release the DD objects */
-extern void screenShutDown(void);
-
 /* The Current screen size and bit depth */
 extern UDWORD		screenWidth;
 extern UDWORD		screenHeight;

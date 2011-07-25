@@ -32,7 +32,8 @@
 #include "lib/ivis_opengl/screen.h"
 #include "lib/netplay/netplay.h"	// multiplayer
 #include "lib/sound/audio.h"
-#include "lib/framework/wzapp_c.h"
+#include "wzapp_c.h" // wzShowMouse, wzSetCursor
+#include "lib/framework/wzticker.h" // wzGetTicks
 
 #include "frontend.h"
 #include "keyedit.h"

@@ -24,7 +24,8 @@
  */
 
 #include "lib/framework/frame.h"
-#include "lib/framework/wzapp_c.h"
+#include "lib/framework/wzticker.h" // wzGetTicks()
+#include "lib/framework/wzthread.h" // Threading
 #include "lib/framework/string_ext.h"
 #include "lib/framework/crc.h"
 #include "lib/framework/file.h"
@@ -1600,7 +1601,7 @@ UBYTE NETrecvFile(NETQUEUE queue)
 				else
 				{
 					uint32_t reason = STUCK_IN_FILE_LOOP;
-	
+
 					NETend();
 					// we should never get here, it means, that the game can't detect the level, but we have the file.
 					// so we kick this player out.

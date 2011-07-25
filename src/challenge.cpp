@@ -32,7 +32,10 @@
 #include <sys/types.h>
 #endif
 
-#include "lib/framework/wzapp.h"
+#include <QtCore/QTime>
+
+#include "wzapp.h"
+
 #include "lib/netplay/netplay.h"
 #include "lib/ivis_opengl/bitimage.h"
 #include "lib/ivis_opengl/pieblitfunc.h"

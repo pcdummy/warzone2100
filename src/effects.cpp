@@ -35,7 +35,7 @@
 	* STILL NEED TO REMOVE SOME MAGIC NUMBERS INTO #DEFINES!!! *
 	************************************************************
 */
-#include "lib/framework/wzapp.h"
+#include "wzapp.h"
 #include "lib/framework/frameresource.h"
 #include "lib/framework/input.h"
 #include "lib/framework/math_ext.h"

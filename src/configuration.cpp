@@ -23,7 +23,7 @@
  *
  */
 
-#include "lib/framework/wzapp.h"
+#include "wzapp.h"
 #include "lib/framework/input.h"
 #include "lib/netplay/netplay.h"
 #include "lib/sound/mixer.h"

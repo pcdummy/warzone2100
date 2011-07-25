@@ -14,8 +14,15 @@ version.o: autorevision.h
 
 autorevision.h: $(warzone2100_SOURCES) $(warzone2100_LIBS)
 	(cd $(top_srcdir) && ./build_tools/autorevision.sh $(abs_top_builddir)/src/autorevision.h || true)
+	
+MOCHEADER = wzapp.h
+MOCEDFILES = wzapp_moc.cpp
+
+%_moc.cpp: %.h
+	$(MOC4) -o $@ $<
 
 BUILT_SOURCES = \
+	$(MOCEDFILES) \
 	autorevision.h \
 	level_lexer.lex.cpp \
 	message_lexer.lex.cpp \
@@ -37,6 +44,8 @@ EXTRA_DIST = \
 
 bin_PROGRAMS = warzone2100
 noinst_HEADERS = \
+	$(MOCHEADER) \
+	wzapp_c.h \
 	action.h \
 	actiondef.h \
 	advvis.h \
@@ -169,6 +178,8 @@ noinst_HEADERS = \
 	wrappers.h
 
 warzone2100_SOURCES = \
+	${MOCEDFILES} \
+	wzapp.cpp \
 	action.cpp \
 	advvis.cpp \
 	ai.cpp \

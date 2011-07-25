@@ -31,6 +31,7 @@
 #include "lib/framework/physfs_ext.h"
 #include "lib/ivis_opengl/tex.h"
 #include "lib/netplay/netplay.h"  // For syncDebug
+#include "lib/framework/wzthread.h"
 
 #include "map.h"
 #include "hci.h"
@@ -50,7 +51,7 @@
 #include "fpath.h"
 #include "levels.h"
 #include "scriptfuncs.h"
-#include "lib/framework/wzapp_c.h"
+#include "wzapp_c.h"
 
 #define GAME_TICKS_FOR_DANGER (GAME_TICKS_PER_SEC * 2)
 

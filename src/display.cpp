@@ -30,8 +30,9 @@
 #include "lib/framework/strres.h"
 #include "lib/ivis_opengl/piestate.h"
 #include "lib/framework/fixedpoint.h"
-#include "lib/framework/wzapp_c.h"
+#include "lib/framework/wzticker.h" // wzGetTicks
 
+#include "wzapp_c.h" // wzSetCursor
 #include "action.h"
 #include "display.h"
 #include "map.h"

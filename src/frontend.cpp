@@ -24,7 +24,7 @@
  * Alex Lee. Pumpkin Studios. Eidos PLC 98,
  */
 
-#include "lib/framework/wzapp.h"
+#include "wzapp.h"
 #include "lib/framework/input.h"
 #include "lib/ivis_opengl/bitimage.h"
 #include "lib/ivis_opengl/pieblitfunc.h"

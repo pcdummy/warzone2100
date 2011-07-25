@@ -40,6 +40,12 @@
 /* Legacy stuff
  * - only used in the sequence video code we have not yet decided whether to port or to junk */
 
+/* Initialise the double buffered display */
+extern bool screenInitialise(void);
+
+/* Release the DD objects */
+extern void screenShutDown(void);
+
 /* Set the colour for text */
 extern void screenSetTextColour(UBYTE red, UBYTE green, UBYTE blue);
 

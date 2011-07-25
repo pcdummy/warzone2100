@@ -22,7 +22,7 @@
  * New scripting system -- script functions
  */
 
-#include "lib/framework/wzapp.h"
+#include "wzapp.h"
 #include "lib/sound/audio.h"
 #include "lib/netplay/netplay.h"
 #include "qtscriptfuncs.h"

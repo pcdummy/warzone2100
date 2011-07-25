@@ -28,7 +28,7 @@
  */
 #include "frame.h"
 #include "file.h"
-#include "wzapp_c.h"
+#include "wzticker.h"
 
 #include <physfs.h>
 
@@ -141,27 +141,6 @@ bool frameInitialise()
 		return false;
 	}
 
-	if (!screenInitialise())
-	{
-/* FIX ME for QT!
-		if (fullScreen)
-		{
-			info("Trying windowed mode now.");
-			if (!screenInitialise(width, height, bitDepth, fsaa, false, vsync))
-			{
-		return false;
-	}
-		}
-		else
-		{
-			return false;
-		}
-*/
-	}
-
-	/* Initialise the input system */
-	inputInitialise();
-
 	/* Initialise the frame rate stuff */
 	InitFrameStuff();
 
@@ -190,9 +169,6 @@ void frameUpdate(void)
  */
 void frameShutDown(void)
 {
-	debug(LOG_NEVER, "Screen shutdown!");
-	screenShutDown();
-
 	// Shutdown the resource stuff
 	debug(LOG_NEVER, "No more resources!");
 	resShutDown();

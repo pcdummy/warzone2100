@@ -25,10 +25,6 @@
 #include <QtCore/QTimer>
 #include <QtOpenGL/QGLWidget>
 #include <QtCore/QBuffer>
-#include <QtCore/QTime>
-#include <QtCore/QThread>
-#include <QtCore/QMutex>
-#include <QtCore/QSemaphore>
 #include <QtCore/QSettings>
 #include <physfs.h>
 
@@ -39,7 +35,7 @@
 #include "lib/framework/frame.h"
 #include "lib/framework/cursors.h"
 #include "lib/ivis_opengl/textdraw.h"
-#include "input.h"
+#include "lib/framework/input.h"
 
 class WzConfig : public QSettings
 {
@@ -72,7 +68,6 @@ private:
 
 	QCursor *cursors[CURSOR_MAX];
 	QTimer *timer;
-	QTime tickCount;
 	QFont regularFont, boldFont, smallFont, scaledFont;
 	bool notReadyToPaint;  ///< HACK Don't draw during initial show(), since some global variables apparently aren't set up.
 	static WzMainWindow *myself;
@@ -88,7 +83,6 @@ public:
 	void setCursor(QCursor cursor);
 	void setFontType(enum iV_fonts FontID);
 	void setFontSize(float size);
-	int ticks() { return tickCount.elapsed(); }
 	void setReadyToPaint() { notReadyToPaint = false; }
 #if 0
 	// Re-enable when Qt's font rendering is improved.
@@ -98,28 +92,6 @@ public:
 public slots:
 	void tick();
 	void close();
-};
-
-struct _wzThread : public QThread
-{
-	_wzThread(int (*threadFunc_)(void *), void *data_) : threadFunc(threadFunc_), data(data_) {}
-	void run()
-	{
-		ret = (*threadFunc)(data);
-	}
-	int (*threadFunc)(void *);
-	void *data;
-	int ret;
-};
-
-// This one couldn't be easier...
-struct _wzMutex : public QMutex
-{
-};
-
-struct _wzSemaphore : public QSemaphore
-{
-	_wzSemaphore(int startValue = 0) : QSemaphore(startValue) {}
 };
 
 #endif

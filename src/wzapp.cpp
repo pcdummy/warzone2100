@@ -38,7 +38,7 @@
 #endif
 
 #include "lib/exceptionhandler/dumpinfo.h"
-#include "file.h"
+#include "lib/framework/file.h"
 #include "lib/ivis_opengl/piestate.h"
 #include "lib/ivis_opengl/pieclip.h"
 #include "lib/ivis_opengl/screen.h"
@@ -131,8 +131,7 @@ WzMainWindow::WzMainWindow(QSize resolution, const QGLFormat &format, QWidget *p
 	myself = this;
 	notReadyToPaint = true;
 	timer = new QTimer(this);
-	tickCount.start();
-	connect(timer, SIGNAL(timeout()), this, SLOT(tick()));
+    connect(timer, SIGNAL(timeout()), this, SLOT(tick()));
 	for (int i = 0; i < CURSOR_MAX; cursors[i++] = NULL) ;
 	timer->start(0);
 	setAutoFillBackground(false);
@@ -710,16 +709,6 @@ void wzQuit()
 	WzMainWindow::instance()->close();
 }
 
-void wzScreenFlip()
-{
-	WzMainWindow::instance()->swapBuffers();
-}
-
-int wzGetTicks()
-{
-	return WzMainWindow::instance()->ticks();
-}
-
 /****************************************/
 /***     Mouse and keyboard support   ***/
 /****************************************/
@@ -997,85 +986,6 @@ bool keyPressed(KEY_CODE code)
 bool keyReleased(KEY_CODE code)
 {
 	return ((aKeyState[code].state == KEY_RELEASED) || (aKeyState[code].state == KEY_PRESSRELEASE));
-}
-
-/**************************/
-/***    Thread support  ***/
-/**************************/
-
-WZ_THREAD *wzThreadCreate(int (*threadFunc)(void *), void *data)
-{
-	return new WZ_THREAD(threadFunc, data);
-}
-
-int wzThreadJoin(WZ_THREAD *thread)
-{
-	thread->wait();
-	int ret = thread->ret;
-	delete thread;
-	return ret;
-}
-
-void wzThreadStart(WZ_THREAD *thread)
-{
-	thread->start();
-}
-
-bool wzIsThreadDone(WZ_THREAD *thread)
-{
-	return thread->isFinished();
-}
-
-void wzYieldCurrentThread()
-{
-#if QT_VERSION >= 0x040500
-	QThread::yieldCurrentThread();
-#endif
-}
-
-WZ_MUTEX *wzMutexCreate()
-{
-	return new WZ_MUTEX;
-}
-
-void wzMutexDestroy(WZ_MUTEX *mutex)
-{
-	delete mutex;
-}
-
-void wzMutexLock(WZ_MUTEX *mutex)
-{
-	mutex->lock();
-}
-
-void wzMutexUnlock(WZ_MUTEX *mutex)
-{
-	mutex->unlock();
-}
-
-WZ_SEMAPHORE *wzSemaphoreCreate(int startValue)
-{
-	return new WZ_SEMAPHORE(startValue);
-}
-
-void wzSemaphoreDestroy(WZ_SEMAPHORE *semaphore)
-{
-	delete semaphore;
-}
-
-void wzSemaphoreWait(WZ_SEMAPHORE *semaphore)
-{
-	semaphore->acquire();
-}
-
-void wzSemaphorePost(WZ_SEMAPHORE *semaphore)
-{
-	semaphore->release();
-}
-
-int wzSemaphoreAvailable(WZ_SEMAPHORE *semaphore)
-{
-	return semaphore->available();
 }
 
 /**************************/
