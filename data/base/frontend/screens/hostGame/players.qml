@@ -117,7 +117,7 @@ Item {
             }
 
             // Non host players arent allowed to use a used flag, disable them.
-            if (!hostGameScreen.isHost)
+            if (!wz.getConfigValue("isHost"))
             {
                 for (var i=0; i<playersModel.count;i++)
                 {
@@ -163,8 +163,8 @@ Item {
 
             // Configure and enable the kick button
             if (!playersModel.get(playerIndex).isAI &&
-                playerIndex != hostGameScreen.playerIndex &&
-                hostGameScreen.isHost)
+                playerIndex != wz.getConfigValue("playerIndex") &&
+                wz.getConfigValue("isHost"))
             {
                 container._kickPlayer = playerIndex
                 kickButton.opacity = 1
@@ -256,7 +256,7 @@ Item {
             border.color: "#0015f0"
             border.width: 1
 
-            opacity: (hostGameScreen.isSkirmish ? 0 : 1)
+            opacity: (wz.getConfigValue("isMultiplayer") ? 1 : 0)
 
             Text {
                 anchors.fill: parent
@@ -421,7 +421,7 @@ Item {
 
                     if (hostGameScreen.playerIndex == oldIndex)
                     {
-                        hostGameScreen.playerIndex = slotIndex
+                        wz.setConfigValue("playerIndex", slotIndex)
                     }
                 }
             }
@@ -468,7 +468,7 @@ Item {
         playersModel.append({isAI: false, team: 0, playerColor: 0, name: wz.getConfigValue("playerName"), isReady: false, isHost: true, isOpen: false,
                             statsPlayed: 0, statsWins: 0, statsLosses: 0, statsTotalKills: 0, statsTotalScore: 0});
 
-        if (hostGameScreen.isSkirmish)
+        if (!wz.getConfigValue("isMultiplayer"))
         {
             for(var i=1;i<hostGameScreen.maxPlayers;i++)
             {
@@ -490,7 +490,7 @@ Item {
         id: playersDelegate
 
         Rectangle {
-            width: hostGameScreen.fixedTeams ? 248 : 217
+            width: wz.getConfigValue("alliance") == 2 ? 248 : 217
             height: 38
 
             color: "#000161"
@@ -531,7 +531,7 @@ Item {
                 id: colorflag
                 width: 33; height: parent.height
 
-                anchors.left: hostGameScreen.fixedTeams ? teamselector.right : parent.left
+                anchors.left: wz.getConfigValue("alliance") == 2 ? teamselector.right : parent.left
 
                 color: "#000161"
                 border.color: "#0015f0"

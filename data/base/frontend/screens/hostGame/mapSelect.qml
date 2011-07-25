@@ -153,14 +153,14 @@ Item {
             text: name
             players: players2
             onClicked: {
-                if (!wz.setMap(hostGameScreen.techlevel, name))
+                if (wz.setMap(hostGameScreen.techlevel, name) == 0)
                 {
                     wz.log("Failed to load map: " + name + ", techlevel: " + hostGameScreen.techlevel);
                 }
                 else
                 {
                     hostGameScreen.maxPlayers = players2
-                    hostGameScreen.map = name + "-T" + hostGameScreen.techlevel;                    
+                    hostGameScreen.map = name
                 }
 
                 mapButton.state = "";

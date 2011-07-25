@@ -66,10 +66,10 @@ public:
      *
      * @param techlevel     Tech level 1-3
      * @param name          Shortened map name.
-     * 
-     * @return Found/Not found.
+     *
+     * @return The maps maxplayers or 0 on not found.
      */
-    Q_INVOKABLE bool setMap(int techlevel, const QString &name);
+    Q_INVOKABLE int setMap(int techlevel, const QString &name);
 
     Q_INVOKABLE void setConfigValue(const QString &name, const QVariant &value);
     Q_INVOKABLE QVariant getConfigValue(const QString &name);

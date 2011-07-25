@@ -67,19 +67,19 @@ Q_INVOKABLE QVariantMap QMLWzHelper::getMapList(int techlevel)
     return Map::getList(Map::GAMETYPE_SKIRMISH_T1);
 }
 
-Q_INVOKABLE bool QMLWzHelper::setMap(int techlevel, const QString &name)
+Q_INVOKABLE int QMLWzHelper::setMap(int techlevel, const QString &name)
 {
-    QVariantMap list = getMapList(techlevel);
+    QVariantMap entry = getMapList(techlevel).value(name).toMap();
 
-    if (!list.contains(name))
+    if (entry.isEmpty())
     {
-        return false;
+        return 0;
     }
-
-    config.set("mapName", name);
+    
+    config.set("mapName", entry["name"]);
     config.set("techlevel", techlevel);
 
-    return true;
+    return entry["players"].toInt();
 }
 
 /**
@@ -107,7 +107,6 @@ Q_INVOKABLE QString QMLWzHelper::getCurrentResolution()
 
 Q_INVOKABLE QStringList QMLWzHelper::getAvailableResolutions()
 {
-    wzLog(LOG_QML) << m_view->availableResolutions();
     return m_view->availableResolutions();
 }
 

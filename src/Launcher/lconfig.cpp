@@ -19,7 +19,6 @@
 
 // self
 #include <src/Launcher/lconfig.h>
-#include <src/Launcher/confighandler.h>
 
 // For init_config() - FSAA_MAX and FMV_MAX
 #include <src/warzoneconfig.h>
@@ -66,7 +65,7 @@ void config_init()
     // Hostgamescreen
     config.add("playerName",            CONFTYPE_STRING,    true,   "Player");
     config.add("gameName",              CONFTYPE_STRING,    true,   "My Game");
-    config.add("mapName",               CONFTYPE_STRING,    true,   "4c-rush");
+    config.add("mapName",               CONFTYPE_STRING,    true,   "4c-rush"); // Internal map name
     config.add("techlevel",             CONFTYPE_INT,       true,   1);
     config.add("scavengers",            CONFTYPE_BOOL,      true,   false);
     config.add("visfog",                CONFTYPE_BOOL,      true,   false);
@@ -99,9 +98,9 @@ void config_init()
     // Data directories
     config.add("configDir",             CONFTYPE_STRING,    false,  "");
     config.add("dataDir",               CONFTYPE_STRING,    false,  "");
-    config.add("customLogfile",         CONFTYPE_STRING,    false,  "");
 
     // Commandline stuff
+    config.add("customLogfile",         CONFTYPE_STRING,    false,  "");
     config.add("drawShadows",           CONFTYPE_BOOL,      false,  true);
     config.add("doCrash",               CONFTYPE_BOOL,      false,  false);
     config.add("doSelftest",            CONFTYPE_BOOL,      false,  false);
@@ -114,4 +113,9 @@ void config_init()
     config.add("loadModSP",             CONFTYPE_STRING,    false,  "");
     config.add("loadModMP",             CONFTYPE_STRING,    false,  "");
     config.add("connectIP",             CONFTYPE_STRING,    false,  "");
+
+    // QML/engine vars
+    config.add("isMultiplayer",         CONFTYPE_BOOL,      false,  false);
+    config.add("isHost",                CONFTYPE_BOOL,      false,  true);
+    config.add("playerIndex",           CONFTYPE_INT,       false,  0);
 }
