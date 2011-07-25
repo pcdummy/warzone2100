@@ -13,6 +13,7 @@ SUBDIRS = \
 	  lib/widget \
 	  lib/qtgame \
 	  src \
+	  src/Launcher \
 	  data \
 	  po \
 	  doc \

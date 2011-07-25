@@ -78,7 +78,7 @@ PKG_PROG_PKG_CONFIG
 AC_PROG_VERSION_CHECK([pkg-config], [0.9])
 
 # Check for Qt
-PKG_CHECK_MODULES(QT4, QtCore QtGui QtOpenGL QtNetwork QtScript QtSvg,,[:])
+PKG_CHECK_MODULES(QT4, QtCore QtGui QtOpenGL QtNetwork QtScript QtSvg QtDeclarative,,[:])
 if test "$pkg_failed" = "yes" ; then
 	AC_MSG_ERROR([Qt not found - required!])
 fi
@@ -459,7 +459,8 @@ AC_CONFIG_FILES([Makefile
 		lib/sound/Makefile
 		lib/widget/Makefile
 		lib/qtgame/Makefile
-		src/Makefile])
+		src/Makefile
+        src/Launcher/Makefile])
 AC_OUTPUT
 
 AS_IF([test "x$enable_debug" = "xyes"],[

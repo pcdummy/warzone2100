@@ -88,6 +88,7 @@ win32/__BUILD_CONFIG.USER
 # Generated executables:
 /build_tools/autorevision/autorevision
 /src/warzone2100-engine
+/src/Launcher/warzone2100
 /tests/astartest
 /tests/maptest
 /tests/pointtree.ppm
