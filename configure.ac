@@ -78,7 +78,7 @@ PKG_PROG_PKG_CONFIG
 AC_PROG_VERSION_CHECK([pkg-config], [0.9])
 
 # Check for Qt
-PKG_CHECK_MODULES(QT4, QtCore QtGui QtOpenGL QtNetwork QtScript,,[:])
+PKG_CHECK_MODULES(QT4, QtCore QtGui QtOpenGL QtNetwork QtScript QtSvg,,[:])
 if test "$pkg_failed" = "yes" ; then
 	AC_MSG_ERROR([Qt not found - required!])
 fi
@@ -451,6 +451,7 @@ AC_CONFIG_FILES([Makefile
 		lib/framework/Makefile
 		lib/exceptionhandler/Makefile
 		lib/gamelib/Makefile
+		lib/imagemap/Makefile
 		lib/ivis_opengl/Makefile
 		lib/netplay/Makefile
 		lib/script/Makefile

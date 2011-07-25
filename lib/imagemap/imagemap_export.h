@@ -1,0 +1,12 @@
+#ifndef IMAGEMAP_GLOBAL_H
+#define IMAGEMAP_GLOBAL_H
+
+#include <QtCore/qglobal.h>
+
+#if defined(IMAGEMAP_LIBRARY)
+#  define IMAGEMAPSHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define IMAGEMAPSHARED_EXPORT Q_DECL_IMPORT
+#endif
+
+#endif // IMAGEMAP_GLOBAL_H

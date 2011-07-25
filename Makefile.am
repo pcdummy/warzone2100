@@ -5,6 +5,7 @@ SUBDIRS = \
 	  lib/exceptionhandler \
 	  lib/script \
 	  lib/sequence \
+	  lib/imagemap \
 	  lib/ivis_opengl \
 	  lib/gamelib \
 	  lib/sound \
