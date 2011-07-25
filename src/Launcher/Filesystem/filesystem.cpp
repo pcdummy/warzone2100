@@ -36,7 +36,11 @@
     #include <CoreServices/CoreServices.h>
 #endif // WZ_OS_WIN
 
-#include <lib/framework/frame.h> // Logger
+// Logger
+#include <lib/framework/frame.h>
+
+// PHYSFS_APPEND, PHYSFS_PREPEND
+#include <lib/framework/physfs_ext.h>
 
 const int LOG_FS = Logger::instance().addLoggingLevel("fs", false);
 
@@ -74,7 +78,6 @@ const int PRIORITY_DATA = 300;
 
 // Static Functions declarations.
 static void getPlatformUserDir(QString& result, const char* appSubDir);
-static void printSearchPath();
 static void addSubdirs(const QString& basedir, const char* subdir, const bool appendToPath);
 static void removeSubdirs(const QString& basedir, const char* subdir);
 static void registerSearchPath(QString path, unsigned int priority);
@@ -294,7 +297,7 @@ static void getPlatformUserDir(QString& result, const char* appSubDir)
     result.append(appSubDir).append(PHYSFS_getDirSeparator());
 }
 
-static void printSearchPath()
+void printSearchPath()
 {
     char ** i, ** searchPath;
 

@@ -30,6 +30,7 @@
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 #include <QtCore/QVariantMap>
+#include <QtCore/QFile>
 
 //Logger
 #include <lib/framework/frame.h>
@@ -81,32 +82,45 @@ ConfigHandler::~ConfigHandler()
     delete m_d;
 }
 
-bool ConfigHandler::loadUserConfig(const QString& filename)
+bool ConfigHandler::loadConfig(const QString& filename)
 {
-    wzLog(LOG_CONFIG) << "Loading configurationfile:" << filename;
+    wzLog(LOG_CONFIG) << "Loading config:" << filename;
     
-    QSettings userconf(filename, QSettings::IniFormat);
+    QSettings configfile(filename, QSettings::IniFormat);
     
-    foreach(QString key, userconf.childKeys())
+    foreach(QString key, configfile.childKeys())
     {
-        set(key, userconf.value(key));
+        set(key, configfile.value(key));
     }
     
     return true;
 }
 
-bool ConfigHandler::storeUserConfig(const QString& filename)
+bool ConfigHandler::storeConfig(const QString& filename, CONFIGCONTEXT context)
 {
-    return true;
-}
+    QVariantMap config;
+    
+    switch (context)
+    {
+        case CONFCONTEXT_USER:
+            wzLog(LOG_CONFIG) << "Saving user config:" << filename;
+            config = m_d->userConfig;
+        break;
 
-bool ConfigHandler::loadEngineConfig(const QString& filename)
-{
-    return true;
-}
+        case CONFCONTEXT_ENGINE:
+            wzLog(LOG_CONFIG) << "Saving engine config:" << filename;
+            config = m_d->engineConfig;
+        break;
+    }
 
-bool ConfigHandler::storeEngineConfig(const QString& filename)
-{
+    QSettings configfile(filename, QSettings::IniFormat);
+    
+    for (QVariantMap::iterator it = config.begin();
+         it != config.end(); ++it)
+    {
+        configfile.setValue(it.key(), it.value());
+    }
+
     return true;
 }
 
@@ -159,18 +173,17 @@ bool ConfigHandler::set(const QString key, QVariant value, bool store)
             }
         break;
     }
-     
-    // Store in engine conf.
+
     m_d->engineConfig.insert(key, value);
 
-    // Store in user conf.
     if (store && confItem.storeUserConf)
     {
+        // Store in user conf.
         m_d->userConfig.insert(key, value);
         
 #ifdef DEBUG
         wzLog(LOG_CONFIG) << "Setting: " << key << "=" << value << "with userconfig";
-#endif           
+#endif
     }
 #ifdef DEBUG
     else
@@ -179,14 +192,17 @@ bool ConfigHandler::set(const QString key, QVariant value, bool store)
     }
 #endif
 
+
     return true;
 }
 
 const QVariant& ConfigHandler::get(const QString key)
 {
-    // Not doing any checks here.
-    return m_d->engineConfig[key];
+    CONFIGOPTION confItem = m_d->options[key];
+
+    assert(confItem.type != CONFTYPE_ERROR);
     
+    return m_d->engineConfig[key];
 }
 
 // Declared "extern" in configuration.h

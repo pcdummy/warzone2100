@@ -37,6 +37,12 @@ enum CONFOPTION_TYPES
     CONFTYPE_ENUM // int bounds checked
 };
 
+enum CONFIGCONTEXT
+{
+    CONFCONTEXT_USER,
+    CONFCONTEXT_ENGINE
+};
+
 class ConfigHandlerPrivate;
 class ConfigHandler
 {
@@ -63,19 +69,17 @@ public:
      *
      * @return Success/Failure
      */
-    bool loadUserConfig(const QString &filename);
+    bool loadConfig(const QString &filename);
 
     /**
      * @brief Stores the users configuration to the given path.
      *
      * @param filename      Users ini config path.
+     * @param context       Config context to store.
      *
      * @return Success/Failure
      */
-    bool storeUserConfig(const QString &filename);
-
-    bool loadEngineConfig(const QString &filename);
-    bool storeEngineConfig(const QString &filename);
+    bool storeConfig(const QString& filename, CONFIGCONTEXT context = CONFCONTEXT_USER);
 
     bool add(const QString key, CONFOPTION_TYPES type, bool storeUserConf, QVariant defaultValue, qint32 maxValue = 0);
 

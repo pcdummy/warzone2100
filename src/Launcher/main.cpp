@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
     
     // Its important this line is before ParseCommandLine as the user
     // can override values by the cmd.
-    config.loadUserConfig("wz::config");    
+    config.loadConfig("wz::config");
        
     // Now do the rest.
     if (!ParseCommandLine(utfargc, utfargv))
@@ -169,4 +169,6 @@ int main(int argc, char *argv[])
     view.run();
 
     app.exec();
+
+    config.storeConfig("wz::config", CONFCONTEXT_USER);
 }

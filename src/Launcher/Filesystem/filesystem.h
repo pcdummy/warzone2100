@@ -25,8 +25,6 @@
 #include <QtCore/QHash>
 
 #include <physfs.h>
-#include <lib/framework/frame.h>
-#include <lib/framework/physfs_ext.h>
 
 enum searchPathMode { mod_clean, mod_campaign, mod_multiplay, mod_override };
 
@@ -133,6 +131,11 @@ const QStringList getLoadedMods();
  * @brief Add a persistant/cmd line mod.
  */
 void addPersistantMod(GAMEMOD_TYPE type, const char* mod);
+
+/**
+ * @brief Prints the current search path (for debugging).
+ */
+void printSearchPath();
 
 } // namespace FileSystem {
 

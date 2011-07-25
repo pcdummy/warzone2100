@@ -26,6 +26,9 @@
 
 #include <src/Launcher/Filesystem/filesystem.h>
 
+// For logging
+#include <lib/framework/frame.h>
+
 namespace FileSystem {
 
 class QPhysfsEngine : public QAbstractFileEngine
@@ -38,17 +41,23 @@ private:
     void realSetFileName(const QString &file)
     {
         name = file;
-        if (!PHYSFS_exists(name.toUtf8().constData())) return;
-
+        
         // Show potential until actually opened
-        flags = QAbstractFileEngine::ExistsFlag |
-                QAbstractFileEngine::ReadOtherPerm |
+        flags = QAbstractFileEngine::ReadOtherPerm |
                 QAbstractFileEngine::WriteOwnerPerm |
                 QAbstractFileEngine::ReadOwnerPerm |
                 QAbstractFileEngine::ReadUserPerm |
                 QAbstractFileEngine::WriteUserPerm;
 
-        if (PHYSFS_isDirectory(name.toUtf8().constData())) flags |= QAbstractFileEngine::DirectoryType;
+        if (PHYSFS_exists(name.toUtf8().constData()))
+        {
+            flags |= QAbstractFileEngine::ExistsFlag;
+        }
+
+        if (PHYSFS_isDirectory(name.toUtf8().constData()))
+        {
+            flags |= QAbstractFileEngine::DirectoryType;
+        }
 
         // No translator for symlinks -> realname so disabled.
         // if (PHYSFS_isSymbolicLink(name.toUtf8().constData())) flags |= QAbstractFileEngine::LinkType;
@@ -180,7 +189,8 @@ public:
             tmp = PHYSFS_openRead(name.toUtf8().constData());
             if (!tmp)
             {
-                qWarning("Failed to open %s for size info: %s", name.toUtf8().constData(), PHYSFS_getLastError());
+                wzLog(LOG_ERROR) << QString("Failed to open %1 for size info: %2")
+                                    .arg(name).arg(PHYSFS_getLastError());
                 return -1;
             }
             int retval = PHYSFS_fileLength(tmp);
@@ -215,12 +225,16 @@ public:
         }
         else
         {
-            qWarning("Bad file open mode: %d", (int)mode);
+            wzLog(LOG_ERROR) << "Bad file open mode: " << mode;
         }
+
+#ifdef DEBUG
         if (!fp)
         {
-            qWarning("Failed to open %s: %s", name.toUtf8().constData(), PHYSFS_getLastError());
+            wzLog(LOG_ERROR) << QString("Failed to open \"%1\": %2")
+                                .arg(name).arg(PHYSFS_getLastError());
         }
+#endif
 
         return fp != NULL;
     }
