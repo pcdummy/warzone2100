@@ -59,8 +59,6 @@ typedef struct _poptContext
 
 // "extern" vars for ParseCommandLineEarly and ParseCommandLine
 bool cmdShowVersion = false;
-char *cmdConfigdir;
-char *cmdDatadir;
 bool cmdDoHostlaunch = false;
 
 static void poptPrintHelp(poptContext ctx, FILE *output, WZ_DECL_UNUSED int unused)
@@ -357,7 +355,7 @@ bool ParseCommandLineEarly(int argc, const char** argv)
                 {
                     qFatal("Unrecognised configuration directory");
                 }
-                cmdConfigdir = strdup(token);
+                config.set("configDir", token);
                 break;
                 
             case CLI_DATADIR:
@@ -367,7 +365,7 @@ bool ParseCommandLineEarly(int argc, const char** argv)
                 {
                     qFatal("Unrecognised datadir");
                 }
-                cmdDatadir = strdup(token);
+                config.set("dataDir", token);
                 break;                
 
             case CLI_HELP:

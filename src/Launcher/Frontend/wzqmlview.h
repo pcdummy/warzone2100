@@ -24,25 +24,34 @@
 #ifndef __SRC_LAUNCHER_WZQMLVIEW_H__
 #define __SRC_LAUNCHER_WZQMLVIEW_H__
 
-
 // Qt Declarative
 #include <QtDeclarative/QDeclarativeView>
 
+extern const int LOG_FRONTEND;
+
+namespace Frontend {
+
+// Forwarder
+class WzHelper;
+    
 class WzQMLViewPrivate;
 class WzQMLView : public QDeclarativeView
 {
     Q_OBJECT
     
 public:
-    WzQMLView();
-    ~WzQMLView();
+    explicit WzQMLView(QWidget* parent = 0);
+    virtual ~WzQMLView();
 
-    void run();
+    void run(const QString mainScreen = QString(), const QString mainMenu = QString());
 
-    const QStringList& availableResolutions() const;
+    const QStringList& getAvailableResolutions() const;
 
 private:
-    WzQMLViewPrivate* m_d;
+    WzQMLViewPrivate* d;
+    WzHelper* wzhelper;
 };
+
+} // namespace Frontend {
 
 #endif // #ifndef __SRC_LAUNCHER_WZQMLVIEW_H__

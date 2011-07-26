@@ -26,8 +26,6 @@
 
 // Vars that gets set by the funcs below.
 extern bool cmdShowVersion;
-extern char *cmdConfigdir;
-extern char *cmdDatadir;
 extern bool cmdDoHostlaunch;
 
 // parse the commandline

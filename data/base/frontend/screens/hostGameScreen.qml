@@ -1,4 +1,5 @@
 import QtQuick 1.0
+import Warzone 1.0
 import "../widgets" as Widgets
 import "../functions.js" as Support
 
@@ -110,12 +111,19 @@ Item {
             onClicked: {
                 if (!hostGameScreen._isHosting) {
                     hostGameScreen.destroy();
-                    window.loadMenu = window.backMenu;
-                    createScreen(window.backScreen);
+                    if (wz.config.get("gameType") == Wz.Multiplayer)
+                    {
+                        createScreen("screens/multiplayer.qml")                        
+                    }
+                    else
+                    {
+                        window.loadMenu = "menu/singlePlayer.qml"
+                        createScreen("screens/menuScreen.qml")
+                    }
                 } else {
                     hostGameScreen._subScreen.destroy();
 
-                    if (wz.config.get("gameType") == 2) {
+                    if (wz.config.get("gameType") == Wz.Multiplayer) {
                         passwordButton.state = ""
                         passwordInput.state = ""
                         hostnameInput.state = ""
@@ -158,7 +166,7 @@ Item {
                 hostGameScreen._isHosting = true
                 createMenu("hostGame/players.qml")
                 chatBox.clear()
-                if (wz.config.get("gameType") == 2) {
+                if (wz.config.get("gameType") == Wz.Multiplayer) {
                     chatBox.addSystemMessage("You'r game is not listed. This is a dummy, haha!")
                 }
             }
@@ -176,7 +184,7 @@ Item {
 
                 onAccepted: {
                     if (wz.config.get("playerName") != text) {
-                        if (wz.config.get("gameType") == 2) {
+                        if (wz.config.get("gameType") == Wz.Multiplayer) {
                             chatBox.addLine(wz.config.get("playerName") + " -> " + text);
                         }
 
@@ -206,9 +214,9 @@ Item {
             Widgets.SingleLineEdit {
                 id: hostnameInput
 
-                text: (wz.config.get("gameType") == 2 ? wz.config.get("gameName") : wz.tr("One-Player Skirmish"))
+                text: (wz.config.get("gameType") == Wz.Multiplayer ? wz.config.get("gameName") : wz.tr("One-Player Skirmish"))
 
-                state: (wz.config.get("gameType") == 2 ? "" : "off")
+                state: (wz.config.get("gameType") == Wz.Multiplayer ? "" : "off")
             }
             Widgets.SingleLineEdit {
                 id: mapInput
@@ -240,7 +248,7 @@ Item {
                 id: passwordInput
                 text: wz.tr("Enter password here")
 
-                state: (wz.config.get("gameType") == 2 ? "" : "off")
+                state: (wz.config.get("gameType") == Wz.Multiplayer ? "" : "off")
 
                 Widgets.ImageButton {
                     id: passwordButton
@@ -257,7 +265,7 @@ Item {
                     activeSourceWidth: 22
                     activeSourceHeight: 22
 
-                    state: (wz.config.get("gameType") == 2 ? "" : "off")
+                    state: (wz.config.get("gameType") == Wz.Multiplayer ? "" : "off")
 
                     onClicked: {
                         defaultSource: "image://imagemap/icon lock on"

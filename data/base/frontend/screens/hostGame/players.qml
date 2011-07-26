@@ -1,4 +1,5 @@
 import QtQuick 1.0
+import Warzone 1.0
 import "../../widgets" as Widgets
 
 Item {
@@ -256,7 +257,7 @@ Item {
             border.color: "#0015f0"
             border.width: 1
 
-            opacity: (wz.config.get("gameType") == 2 ? 1 : 0)
+            opacity: (wz.config.get("gameType") == Wz.Multiplayer ? 1 : 0)
 
             Text {
                 anchors.fill: parent
@@ -468,7 +469,7 @@ Item {
         playersModel.append({isAI: false, team: 0, playerColor: 0, name: wz.config.get("playerName"), isReady: false, isHost: true, isOpen: false,
                             statsPlayed: 0, statsWins: 0, statsLosses: 0, statsTotalKills: 0, statsTotalScore: 0});
 
-        if (!wz.config.get("gameType") == 2)
+        if (!wz.config.get("gameType") == Wz.Multiplayer)
         {
             for(var i=1;i<hostGameScreen.maxPlayers;i++)
             {

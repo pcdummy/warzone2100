@@ -6,13 +6,13 @@ AM_YFLAGS = -d
 
 warzone2100_MOCH = \
 		confighandler.h \
-		qmlwzhelper.h \
-		wzqmlview.h
+		Frontend/wzhelper_moc.cpp \
+		Frontend/wzqmlview_moc.cpp
 		   
 warzone2100_MOCFILES = \
 		confighandler_moc.cpp \
-		qmlwzhelper_moc.cpp \
-		wzqmlview_moc.cpp
+		Frontend/wzhelper_moc.cpp \
+		Frontend/wzqmlview_moc.cpp
 
 %_moc.cpp: %.h
 	$(MOC4) -o $@ $<
@@ -30,12 +30,12 @@ noinst_HEADERS = \
 	lconfig.h \
 	Filesystem/filesystem.h \
 	Filesystem/qphysfsenginehandler.h \
+	Frontend/imageprovider.h \
+	Frontend/wzhelper.h \
+	Frontend/wzqmlview.h \
 	confighandler.h \
 	Map/levparser.h \
-	Map/map.h \
-	qmlimagemapprovider.h \
-	qmlwzhelper.h \
-	wzqmlview.h
+	Map/map.h
 
 warzone2100_SOURCES = \
 	${warzone2100_MOCFILES} \
@@ -43,13 +43,12 @@ warzone2100_SOURCES = \
 	lconfig.cpp \
 	confighandler.cpp \
 	Filesystem/filesystem.cpp \
+	Frontend/imageprovider.cpp \
+	Frontend/wzhelper.cpp \
+	Frontend/wzqmlview.cpp \
 	main.cpp \
 	Map/levparser.cpp \
-	Map/map.cpp \
-	qmlimagemapprovider.cpp \
-	qmlwzhelper.cpp \
-	wzqmlview.cpp
-
+	Map/map.cpp
 
 warzone2100_LIBS = \
 	$(top_builddir)/lib/imagemap/libimagemap.a \
@@ -57,5 +56,5 @@ warzone2100_LIBS = \
 	$(top_builddir)/lib/qtgame/libqtgame.a
 
 warzone2100_LDADD = $(warzone2100_LIBS) $(LTLIBINTL) $(PHYSFS_LIBS) $(PNG_LIBS) $(OGGVORBIS_LIBS) \
-	$(THEORA_LIBS) $(OPENAL_LIBS) $(OPENGLC_LIBS) $(OPENGL_LIBS) $(QT4_LIBS) $(QJSON_LIBS) $(GLEW_LIBS) \
+	$(OPENAL_LIBS) $(OPENGLC_LIBS) $(OPENGL_LIBS) $(QT4_LIBS) $(QJSON_LIBS) $(GLEW_LIBS) \
 	$(X_LIBS) $(X_EXTRA_LIBS)

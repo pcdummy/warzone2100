@@ -36,10 +36,12 @@ namespace Imagemap {
 }
 class QPixmap;
 
-class QMLImagemapProvider : public QDeclarativeImageProvider
+namespace Frontend {
+    
+class ImagemapProvider : public QDeclarativeImageProvider
 {
 public:
-    QMLImagemapProvider()
+    ImagemapProvider()
         : QDeclarativeImageProvider(QDeclarativeImageProvider::Pixmap)
     {
     }
@@ -52,5 +54,7 @@ private:
     QHash<QString, Imagemap::Map*> m_maps;
     QString m_basepath;
 };
+
+} // namespace Frontend {
 
 #endif // #ifndef LAUNCHER_QMLIMAGEPROVIDER_H

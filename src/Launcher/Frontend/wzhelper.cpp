@@ -17,7 +17,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 */
 // Self
-#include "qmlwzhelper.h"
+#include "wzhelper.h"
 
 // Qt Core
 #include "QtCore/QVariant"
@@ -29,27 +29,30 @@
 // Configuration
 #include "confighandler.h"
 
+// LOG_FRONTEND and availableResolutions
+#include "wzqmlview.h"
+
 // framework - Logger and i18n
 #include <lib/framework/frame.h>
 
-static const int LOG_QML = Logger::instance().addLoggingLevel("qml", false);
+namespace Frontend {
 
-Q_INVOKABLE void QMLWzHelper::logVariant(const QVariant &message)
+Q_INVOKABLE void WzHelper::logVariant(const QVariant &message)
 {
-    wzLog(LOG_QML) << message;
+    wzLog(LOG_FRONTEND) << message;
 }
 
-Q_INVOKABLE void QMLWzHelper::log(const QString &message)
+Q_INVOKABLE void WzHelper::log(const QString &message)
 {
-    wzLog(LOG_QML) << message;
+    wzLog(LOG_FRONTEND) << message;
 }
 
-Q_INVOKABLE QString QMLWzHelper::tr(const QString& text)
+Q_INVOKABLE QString WzHelper::tr(const QString& text)
 {
     return QString::fromUtf8(_(text.toUtf8().constData()));
 }
 
-Q_INVOKABLE QVariantMap QMLWzHelper::getMapList(int techlevel)
+Q_INVOKABLE QVariantMap WzHelper::getMapList(int techlevel)
 {
     switch (techlevel)
     {
@@ -67,7 +70,7 @@ Q_INVOKABLE QVariantMap QMLWzHelper::getMapList(int techlevel)
     return Map::getList(Map::GAMETYPE_SKIRMISH_T1);
 }
 
-Q_INVOKABLE int QMLWzHelper::setMap(int techlevel, const QString &name)
+Q_INVOKABLE int WzHelper::setMap(int techlevel, const QString &name)
 {
     QVariantMap entry = getMapList(techlevel).value(name).toMap();
 
@@ -84,23 +87,28 @@ Q_INVOKABLE int QMLWzHelper::setMap(int techlevel, const QString &name)
     return entry["players"].toInt();
 }
 
-Q_INVOKABLE QString QMLWzHelper::getCurrentResolution()
+Q_INVOKABLE QString WzHelper::getCurrentResolution()
 {
     return QString("%1 x %2").arg(config.get("width").toInt())
                              .arg(config.get("height").toInt());
 }
 
-Q_INVOKABLE QStringList QMLWzHelper::getAvailableResolutions()
+Q_INVOKABLE QStringList WzHelper::getAvailableResolutions()
 {
-    return m_view->availableResolutions();
+    if (!m_view)
+    {
+        return QStringList();
+    }
+    
+    return m_view->getAvailableResolutions();
 }
 
-Q_INVOKABLE void QMLWzHelper::setResolution(const QString& resolution)
+Q_INVOKABLE void WzHelper::setResolution(const QString& resolution)
 {
     QStringList res = resolution.split(" x ");
     if (res.size() != 2)
     {
-        wzLog(LOG_QML) << "Invalid resolution" << resolution << "received.";
+        wzLog(LOG_FRONTEND) << "Invalid resolution" << resolution << "received.";
         return;
     }
 
@@ -108,15 +116,16 @@ Q_INVOKABLE void QMLWzHelper::setResolution(const QString& resolution)
     config.set("height", res.at(1));
 }
 
-Q_INVOKABLE QString QMLWzHelper::getLanguage()
+Q_INVOKABLE QString WzHelper::getLanguage()
 {
     return getLanguageName();
 }
 
-Q_INVOKABLE QString QMLWzHelper::setNextLanguage()
+Q_INVOKABLE QString WzHelper::setNextLanguage()
 {
     ::setNextLanguage();
     config.set("language", ::getLanguage());
     return getLanguageName();
 }
 
+} // namespace Frontend {

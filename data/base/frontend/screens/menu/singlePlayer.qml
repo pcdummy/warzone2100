@@ -1,4 +1,5 @@
 import QtQuick 1.0
+import Warzone 1.0
 import "../../widgets" as Widgets
 
 Item {
@@ -24,8 +25,7 @@ Item {
     Widgets.MenuTextButton {
         text: wz.tr("Start Skirmish Game"); width: parent.width; bwidth: 248; y: 80;
         onClicked: {
-            window.backScreen = "screens/menuScreen.qml"; window.backMenu = "menu/singlePlayer.qml";
-            wz.config.set("gameType", 2);
+            wz.config.set("gameType", Wz.Campaign);
             wz.config.set("isHost", true);
             wz.config.set("playerIndex", 0);
             createScreen("screens/hostGameScreen.qml");

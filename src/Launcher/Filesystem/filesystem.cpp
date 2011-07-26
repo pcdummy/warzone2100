@@ -87,7 +87,7 @@ static void findMods(MOD_LIST& modList, const char* subdir);
 static void findAvailableMods(bool forceReload = false);
 static bool loadPersistantMods(searchPathMode mode);
 
-QString init(const QString &binpath, const char* appSubDir, const QString& cmdUserConfigdir)
+bool init(const QString &binpath, const char* appSubDir, const QString &cmdUserConfigdir)
 {
     QString tmpdir;
 
@@ -106,7 +106,7 @@ QString init(const QString &binpath, const char* appSubDir, const QString& cmdUs
     if (linked.major < 2)
     {
         wzLog(LOG_FATAL) << "At least version 2 of PhysicsFS required!";
-        return QString();
+        return false;
     }
 
     PHYSFS_permitSymbolicLinks(1);
@@ -117,7 +117,7 @@ QString init(const QString &binpath, const char* appSubDir, const QString& cmdUs
         if (!QFile::exists(tmpdir) && !QDir().mkdir(tmpdir))
         {
             wzLog(LOG_FATAL) << QString("Error creating user directory \"%1\"").arg(tmpdir);
-            return QString();
+            return false;
         }
     }
     else
@@ -133,7 +133,7 @@ QString init(const QString &binpath, const char* appSubDir, const QString& cmdUs
         if (!QFile::exists(tmpdir) && !QDir().mkdir(tmpdir))
         {
             wzLog(LOG_FATAL) << QString("Error creating custom user directory \"%1\"").arg(tmpdir);
-            return QString();
+            return false;
         }
     }
 
@@ -141,12 +141,12 @@ QString init(const QString &binpath, const char* appSubDir, const QString& cmdUs
     {
         wzLog(LOG_FATAL) << QString("Error setting write directory to \"%1\": %2")
             .arg(tmpdir).arg(PHYSFS_getLastError());
-        return QString();
+        return false;
     }
     
     PHYSFS_addToSearchPath(PHYSFS_getWriteDir(), PHYSFS_PREPEND);
     
-    return tmpdir;
+    return true;
 }
 
 void shutdown()
@@ -167,7 +167,7 @@ bool setSearchPathMode(searchPathMode mode)
     return loadPersistantMods(mode);
 }
 
-QString scanDataDirs(const QString cmdDataDir, const QString fallbackDir)
+bool scanDataDirs(const QString &cmdDataDir, const QString &fallbackDir)
 {
     QString basedir(PHYSFS_getBaseDir());
     QString separator(PHYSFS_getDirSeparator());
@@ -257,10 +257,10 @@ QString scanDataDirs(const QString cmdDataDir, const QString fallbackDir)
     else
     {
         wzLog(LOG_FATAL) << "Could not find game data. Aborting.";
-        return QString();
+        return false;
     }
 
-    return QString(PHYSFS_getRealDir("gamedesc.lev"));
+    return true;
 }
 
 static void getPlatformUserDir(QString& result, const char* appSubDir)

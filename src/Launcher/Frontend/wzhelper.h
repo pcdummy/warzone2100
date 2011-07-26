@@ -28,21 +28,33 @@
 #include <QtCore/QObject>
 #include <QtCore/QVariantMap>
 #include <QtCore/QString>
+#include <QtCore/QStringList>
 
-// WzQMLView to get resolutions.
-#include <wzqmlview.h>
+// QML_DECLARE_TYPE Macro
+#include <QtDeclarative/qdeclarative.h>
 
+// Configuration
 #include <confighandler.h>
 
-class QMLWzHelper : public QObject
+// GAMETYPE enum
+#include <lconfig.h>
+
+namespace Frontend {
+
+// Forwarder
+class WzQMLView;
+    
+class WzHelper : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QObject* config READ getConfig CONSTANT)
 public:
-    QMLWzHelper(WzQMLView *qmlview) :
-        m_view(qmlview)
-    {        
-    };
+    WzHelper(WzQMLView* qmlview = 0) :
+        m_view(qmlview) {}
+
+    virtual ~WzHelper() {};
+
+    WzHelper(const WzHelper& copy) : QObject() {};
 
     /**
      * @brief Helper for the property "config".
@@ -52,6 +64,13 @@ public:
         return &config;
     }
 
+    Q_ENUMS(Gametype)
+    enum Gametype {
+        Campaign = GAMETYPE_CAMPAIGN,
+        SinglePlayer = GAMETYPE_SINGLEPLAYER,
+        Multiplayer = GAMETYPE_MULTIPLAYER
+    };
+    
     /**
      * @brief Log a message to wzLog.
      */
@@ -88,9 +107,13 @@ public:
 
     Q_INVOKABLE QString getLanguage();
     Q_INVOKABLE QString setNextLanguage();
-
 private:
     WzQMLView* m_view;
 };
+
+} // namespace Frontend {
+
+Q_DECLARE_METATYPE(Frontend::WzHelper::Gametype)
+QML_DECLARE_TYPE(Frontend::WzHelper)
 
 #endif // LAUNCHER_QMLWZHELPER_H

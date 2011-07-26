@@ -51,7 +51,7 @@ typedef QHash<QString, QString> MOD_LIST;
  *
  * @return Path to the config dir (empty on failure).
  */
-QString init(const QString &binpath, const char* appSubDir, const QString& userConfigDir = QString());
+bool init(const QString &binpath, const char* appSubDir, const QString &userConfigDir = QString());
 
 /**
  * @brief Finds the application data and adds it to the search path.
@@ -61,7 +61,7 @@ QString init(const QString &binpath, const char* appSubDir, const QString& userC
  *
  * @return Path to the data dir (empty on failure).
  */
-QString scanDataDirs(const QString cmdDataDir = QString(), const QString fallbackDir = QString());
+bool scanDataDirs(const QString &cmdDataDir = QString(), const QString &fallbackDir = QString());
 
 /**
  * @brief Cleanup stuff and deinitalize PHYSFS.

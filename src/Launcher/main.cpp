@@ -14,7 +14,7 @@
 #include <src/Launcher/lconfig.h>
 #include <src/Launcher/Filesystem/filesystem.h>
 #include <src/Launcher/clparse.h>
-#include <src/Launcher/wzqmlview.h>
+#include <src/Launcher/Frontend/wzqmlview.h>
 
 // Get platform defines before checking for them.
 // Qt headers MUST come before platform specific stuff!
@@ -78,19 +78,15 @@ int main(int argc, char *argv[])
         return EXIT_SUCCESS;
     }    
         
-    tmpstr = FileSystem::init(args.at(0), WZ_WRITEDIR, cmdConfigdir);
-    if (tmpstr.isEmpty())
+    if (!FileSystem::init(args.at(0), WZ_WRITEDIR, config.get("configDir").toString()))
     {
         return EXIT_FAILURE;
     }
-    config.set("configDir", QVariant(tmpstr));      
     
-    tmpstr = FileSystem::scanDataDirs(cmdDatadir, WZ_DATADIR);
-    if (tmpstr.isEmpty())
+    if (!FileSystem::scanDataDirs(config.get("dataDir").toString(), WZ_DATADIR))
     {
         return EXIT_FAILURE;
     }
-    config.set("dataDir", QVariant(tmpstr));         
     
     // Its important this line is before ParseCommandLine as the user
     // can override values by the cmd.
@@ -160,14 +156,36 @@ int main(int argc, char *argv[])
 
     /*** Initialize translations ***/
     initI18n();
-    wzLog(LOG_WZ) << QString("Using language: %1").arg(getLanguage());
+    wzLog(LOG_MAIN) << QString("Using language: %1").arg(getLanguage());
 
     // wzLog(LOG_WZ) << QString("Warzone 2100 - %1").arg(version_getFormattedVersionString());
 
-    // Now run the frontend
-    WzQMLView view;
-    view.run();
+    if (config.get("doCrash").toBool() ||
+        config.get("doSelftest").toBool())
+    {
+        wzLog(LOG_INFO) << "Would run engine crashtest/selftest here.";
+        return EXIT_FAILURE;
+    }
+    else if (!config.get("saveGame").toString().isEmpty() ||
+             !config.get("game").toString().isEmpty())
+    {
+        config.set("gameType", GAMETYPE_SINGLEPLAYER);
+        wzLog(LOG_INFO) << "Would open a singleplayer game here.";
+        return EXIT_FAILURE;
+    }
 
+    // Now run the frontend
+    Frontend::WzQMLView view;
+    if (cmdDoHostlaunch)
+    {
+        config.set("gameType", GAMETYPE_MULTIPLAYER);
+        view.run("screens/hostGameScreen.qml");
+    }
+    else
+    {
+        view.run();
+    }
+    
     app.exec();
 
     config.storeConfig("wz::config", CONFCONTEXT_USER);

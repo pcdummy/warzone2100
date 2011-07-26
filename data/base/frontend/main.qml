@@ -12,14 +12,14 @@ Image {
 
     property string backScreen
     property string backMenu
-    property string loadMenu
+    property string loadMenu   : gLoadMenu
+    property string loadScreen : gLoadScreen
 
     property variant _subComponent
     property variant _subScreen
 
     Component.onCompleted: {
-        window.loadMenu = "menu/main.qml"
-        createScreen("screens/menuScreen.qml")
+        createScreen(window.loadScreen)
     }
 
     function createScreen(file)

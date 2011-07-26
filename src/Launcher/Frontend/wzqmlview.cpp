@@ -20,73 +20,74 @@
  * @file wzqmlview.h
  *
  * The launchers Declarative View,
- *
- * TODO: I am not sure if this should be a class. - Fast.
  */
 
 // Self
 #include "wzqmlview.h"
 
 // qtgame
-#include "lib/qtgame/qtgame.h"
+#include <lib/qtgame/qtgame.h>
 
 // Imagemap
-#include "lib/imagemap/loader.h"
+#include <lib/imagemap/loader.h>
 
-// Configuration
-#include "confighandler.h"
+// Configuration will be registered
+#include <confighandler.h>
 
 // Image map to qml proxy.
-#include "qmlimagemapprovider.h"
+#include "imageprovider.h"
 
 // wzHelper - QML Helper
-#include "qmlwzhelper.h"
+#include "wzhelper.h"
 
 // Qt Gui for the quit signal.
 #include <QtGui/QApplication>
 
 // Qt Declarative
+
 #include <QtDeclarative/QDeclarativeEngine>
 #include <QtDeclarative/QDeclarativeContext>
+
+#include <QtGui/QGraphicsView>
 
 // framework - logging
 #include "lib/framework/frame.h"
 
+const int LOG_FRONTEND = Logger::instance().addLoggingLevel("frontend", false);
+
+namespace Frontend {
+
 class WzQMLViewPrivate
 {
 public:
-    WzQMLViewPrivate()
-    {
+    WzQMLViewPrivate() :
+        viewPort(0), improvider(0) {}
 
-    };
+    void init();
 
-    ~WzQMLViewPrivate()
-    {
-        // TODO: This segfaults.
-/*        delete wzhelper;
-        delete improvider;
-        delete viewPort;*/
-    }
-    
     QtGameWidget* viewPort;
-    QMLImagemapProvider* improvider;
-    QMLWzHelper* wzhelper;
+    ImagemapProvider* improvider;
     QStringList resolutions;
 };
 
-WzQMLView::WzQMLView()
+
+WzQMLView::WzQMLView(QWidget *parent)
+    : QDeclarativeView(parent)
 {
-    m_d = new WzQMLViewPrivate;
+    d = new WzQMLViewPrivate();
+    wzhelper = new WzHelper(this);
+    d->init();
 }
 
 WzQMLView::~WzQMLView()
 {
-    delete m_d;
+    delete wzhelper;
+    delete d;
 }
 
-void WzQMLView::run()
+void WzQMLViewPrivate::init()
 {
-    wzLog(LOG_WZ) << "Setting up the viewport.";
+    wzLog(LOG_FRONTEND) << "Setting up the viewport.";
 
     // Workaround for incorrect text rendering on nany platforms.
     QGL::setPreferredPaintEngine(QPaintEngine::OpenGL);
@@ -101,23 +102,20 @@ void WzQMLView::run()
         format.setSamples(config.get("FSAA").toInt());
     }
 
-    m_d->viewPort = new QtGameWidget(QSize(config.get("width").toInt(),
+    viewPort = new QtGameWidget(QSize(config.get("width").toInt(),
                                         config.get("height").toInt()), format);
-    if (!m_d->viewPort->context()->isValid())
+    
+    // Enable VSync
+    viewPort->setSwapInterval(true);
+    
+    if (!viewPort->context()->isValid())
     {
         wzLog(LOG_FATAL) << "Failed to create an OpenGL context.\n"
                             << "This probably means that your graphics drivers are out of date.\n"
                             << "Try updating them!";
     }
 
-    m_d->improvider = new QMLImagemapProvider();
-    m_d->wzhelper = new QMLWzHelper(this);
-
-
-    setViewport(m_d->viewPort);
-    setResizeMode(QDeclarativeView::SizeRootObjectToView);
-
-    wzLog(LOG_WZ) << "Loading the imagemaps.";
+    wzLog(LOG_FRONTEND) << "Loading the imagemaps.";
     // Add data/frontend/images/imagemap.js to the imagemap loader
     if (!Imagemap::Loader::instance().addImagemap("wz::frontend/images/imagemap.js"))
     {
@@ -125,18 +123,51 @@ void WzQMLView::run()
         qFatal("%s", qPrintable(Imagemap::Loader::instance().errorString()));
     }
 
-    engine()->addImageProvider("imagemap", m_d->improvider);
-    rootContext()->setContextProperty("wz", m_d->wzhelper);
+    qmlRegisterType<WzHelper>("Warzone",1,0,"Wz");
 
-    setSource(QUrl("wz::frontend/main.qml"));    
+    improvider = new ImagemapProvider();
+}
 
-    // Enable VSync
-    m_d->viewPort->setSwapInterval(true);
+void WzQMLView::run(const QString loadScreen, const QString loadMenu)
+{
+    wzLog(LOG_FRONTEND) << "set viewport";
+    setViewport(d->viewPort);
+    setResizeMode(QDeclarativeView::SizeRootObjectToView);
 
+    wzLog(LOG_FRONTEND) << "call engine";
+    engine()->addImageProvider("imagemap", d->improvider);
+
+    rootContext()->setContextProperty("wz", wzhelper);
+
+    wzLog(LOG_FRONTEND) << "execute";
+    setSource(QUrl("wz::frontend/main.qml"));
+
+    QObject::connect(engine(), SIGNAL(quit()), QApplication::instance(), SLOT(quit()));
+    
+    if (!loadScreen.isEmpty())
+    {
+        rootContext()->setContextProperty("gLoadScreen", loadScreen);
+    }
+    else
+    {
+        rootContext()->setContextProperty("gLoadScreen", "screens/menuScreen.qml");
+    }
+
+    if (!loadMenu.isEmpty())
+    {
+        rootContext()->setContextProperty("gLoadMenu", loadMenu);
+    }
+    else
+    {
+        rootContext()->setContextProperty("gLoadMenu", "menu/main.qml");
+    }
+    
     int w, h;
     // Setup Fullscreen/window mode.
     w = config.get("width").toInt();
     h = config.get("height").toInt();
+
+    wzLog(LOG_FRONTEND) << "show, size:" << w << "x" << h;
     
     if (config.get("fullscreen").toBool())
     {
@@ -149,25 +180,25 @@ void WzQMLView::run()
         setMinimumSize(w, h);
         setMaximumSize(w, h);
     }
-
-    connect(engine(), SIGNAL(quit()), QApplication::instance(), SLOT(quit()));
 }
 
-const QStringList& WzQMLView::availableResolutions() const
+const QStringList& WzQMLView::getAvailableResolutions() const
 {
-    if (!m_d->resolutions.isEmpty())
+    if (!d->resolutions.isEmpty())
     {
-        return m_d->resolutions;
+        return d->resolutions;
     }
     
-    QList<QSize> resolutions(m_d->viewPort->availableResolutions());
+    QList<QSize> res(d->viewPort->availableResolutions());
 
-    foreach(QSize resolution, resolutions)
+    foreach(QSize resSize, res)
     {
-        m_d->resolutions.append(QString("%1 x %2")
-                            .arg(resolution.width())
-                            .arg(resolution.height()));
+        d->resolutions.append(QString("%1 x %2")
+                            .arg(resSize.width())
+                            .arg(resSize.height()));
     }
 
-    return m_d->resolutions;
+    return d->resolutions;
 }
+
+} // namespace Frontend

@@ -17,7 +17,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
-#include "qmlimagemapprovider.h"
+#include "imageprovider.h"
 
 #include <lib/imagemap/loader.h>
 
@@ -25,7 +25,9 @@
 
 #include "lib/framework/frame.h"
 
-QPixmap QMLImagemapProvider::requestPixmap(const QString &id, QSize *size, const QSize &requestedSize)
+namespace Frontend {
+    
+QPixmap ImagemapProvider::requestPixmap(const QString &id, QSize *size, const QSize &requestedSize)
 {
     QStringList path = id.split(':');
 
@@ -46,3 +48,5 @@ QPixmap QMLImagemapProvider::requestPixmap(const QString &id, QSize *size, const
 
     return image;
 }
+
+} // namespace Frontend {
