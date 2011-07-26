@@ -25,9 +25,9 @@ Item {
         text: wz.tr("Start Skirmish Game"); width: parent.width; bwidth: 248; y: 80;
         onClicked: {
             window.backScreen = "screens/menuScreen.qml"; window.backMenu = "menu/singlePlayer.qml";
-            wz.setConfigValue("isMultiplayer", false);
-            wz.setConfigValue("isHost", true);
-            wz.setConfigValue("playerIndex", 0);
+            wz.config.set("gameType", 2);
+            wz.config.set("isHost", true);
+            wz.config.set("playerIndex", 0);
             createScreen("screens/hostGameScreen.qml");
         }
     }

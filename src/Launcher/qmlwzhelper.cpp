@@ -84,23 +84,6 @@ Q_INVOKABLE int QMLWzHelper::setMap(int techlevel, const QString &name)
     return entry["players"].toInt();
 }
 
-/**
- * This would normaly call one of the thousands setters Warzone has.
- */
-Q_INVOKABLE void QMLWzHelper::setConfigValue(const QString& name, const QVariant& value)
-{
-    // TODO: May check if successfull.
-    config.set(name, value);
-}
-
-/**
- * This would normaly call one of the thousands getters Warzone has.
- */
-Q_INVOKABLE QVariant QMLWzHelper::getConfigValue(const QString &name)
-{
-    return config.get(name);
-}
-
 Q_INVOKABLE QString QMLWzHelper::getCurrentResolution()
 {
     return QString("%1 x %2").arg(config.get("width").toInt())

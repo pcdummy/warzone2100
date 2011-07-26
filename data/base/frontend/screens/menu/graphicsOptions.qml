@@ -62,8 +62,8 @@ Item {
         Widgets.ClickSelect {
             width: parent.width;
             options: [wz.tr("Windowed"), wz.tr("Fullscreen")];
-            value: wz.getConfigValue("fullscreen") ? 1 : 0;
-            onValueChanged: wz.setConfigValue("fullscreen", (value == 1))
+            value: wz.config.get("fullscreen") ? 1 : 0;
+            onValueChanged: wz.config.set("fullscreen", (value == 1))
         }
         Widgets.ClickSelect {
             width: parent.width;
@@ -74,20 +74,20 @@ Item {
         Widgets.ClickSelect {
             width: parent.width;
             options: [128, 256, 512, 1024, 2048]
-            value: options.indexOf(wz.getConfigValue("textureSize"))
-            onValueChanged: wz.setConfigValue("textureSize", options[value])
+            value: options.indexOf(wz.config.get("textureSize"))
+            onValueChanged: wz.config.set("textureSize", options[value])
         }
         Widgets.ClickSelect {
             width: parent.width;
             options: [wz.tr("Off"), wz.tr("On")]
-            value: wz.getConfigValue("vsync") ? 1 : 0;
-            onValueChanged: wz.setConfigValue("vsync", (value == 1))
+            value: wz.config.get("vsync") ? 1 : 0;
+            onValueChanged: wz.config.set("vsync", (value == 1))
         }
         Widgets.ClickSelect {
             width: parent.width;
             options: [wz.tr("Off"), "2X", "4X", "8X"]
-            value: wz.getConfigValue("FSAA")
-            onValueChanged: wz.setConfigValue("FSAA", value)
+            value: wz.config.get("FSAA")
+            onValueChanged: wz.config.set("FSAA", value)
         }
     }
 }

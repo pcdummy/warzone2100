@@ -44,8 +44,8 @@ Item {
         anchors.left: labels.right
 
         spacing: 24
-        Widgets.Slider {width: parent.width; value: wz.getConfigValue("voicevol"); onValueChanged: wz.setConfigValue("voicevol", value)}
-        Widgets.Slider {width: parent.width; value: wz.getConfigValue("fxvol"); onValueChanged: wz.setConfigValue("fxvol", value)}
-        Widgets.Slider {width: parent.width; value: wz.getConfigValue("cdvol"); onValueChanged: wz.setConfigValue("cdvol", value)}
+        Widgets.Slider {width: parent.width; value: wz.config.get("voicevol"); onValueChanged: wz.config.set("voicevol", value)}
+        Widgets.Slider {width: parent.width; value: wz.config.get("fxvol"); onValueChanged: wz.config.set("fxvol", value)}
+        Widgets.Slider {width: parent.width; value: wz.config.get("cdvol"); onValueChanged: wz.config.set("cdvol", value)}
     }
 }

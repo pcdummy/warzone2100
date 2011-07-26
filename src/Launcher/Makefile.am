@@ -5,10 +5,12 @@ AM_LFLAGS = $(FLEX_FLAGS)
 AM_YFLAGS = -d
 
 warzone2100_MOCH = \
+		confighandler.h \
 		qmlwzhelper.h \
 		wzqmlview.h
 		   
 warzone2100_MOCFILES = \
+		confighandler_moc.cpp \
 		qmlwzhelper_moc.cpp \
 		wzqmlview_moc.cpp
 

@@ -37,6 +37,9 @@
 
 static const int LOG_CONFIG = Logger::instance().addLoggingLevel("config", false);
 
+// Improve me.
+static const QVariant emptyQVariant;
+
 struct CONFIGOPTION
 {
     CONFOPTION_TYPES type;
@@ -129,7 +132,7 @@ bool ConfigHandler::add(const QString key, CONFOPTION_TYPES type, bool storeUser
     return m_d->add(key, type, storeUserConf, defaultValue, maxValue);
 }
 
-bool ConfigHandler::set(const QString key, QVariant value, bool store)
+Q_INVOKABLE bool ConfigHandler::set(const QString key, QVariant value, bool store)
 {
     CONFIGOPTION confItem = m_d->options[key];
 
@@ -196,11 +199,15 @@ bool ConfigHandler::set(const QString key, QVariant value, bool store)
     return true;
 }
 
-const QVariant& ConfigHandler::get(const QString key)
+Q_INVOKABLE QVariant ConfigHandler::get(const QString key)
 {
     CONFIGOPTION confItem = m_d->options[key];
 
-    assert(confItem.type != CONFTYPE_ERROR);
+    if (confItem.type == CONFTYPE_ERROR)
+    {
+        wzLog(LOG_ERROR) << "Unknow config key: " << key;
+        return emptyQVariant;
+    }
     
     return m_d->engineConfig[key];
 }

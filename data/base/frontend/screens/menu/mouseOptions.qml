@@ -48,26 +48,26 @@ Item {
         Widgets.ClickSelect {
             width: parent.width;
             options: [wz.tr("Off"), wz.tr("On")]
-            value: wz.getConfigValue("mouseflip") ? 1 : 0;
-            onValueChanged: wz.setConfigValue("mouseflip", (value == 1))
+            value: wz.config.get("mouseflip") ? 1 : 0;
+            onValueChanged: wz.config.set("mouseflip", (value == 1))
         }
         Widgets.ClickSelect {
             width: parent.width; height: 60;
             options: [wz.tr("Off"), wz.tr("On")]
-            value: wz.getConfigValue("trapCursor") ? 1 : 0;
-            onValueChanged: wz.setConfigValue("trapCursor", (value == 1))
+            value: wz.config.get("trapCursor") ? 1 : 0;
+            onValueChanged: wz.config.set("trapCursor", (value == 1))
         }
         Widgets.ClickSelect {
             width: parent.width;
             options: [wz.tr("Off"), wz.tr("On")]
-            value: wz.getConfigValue("RightClickOrders") ? 1 : 0;
-            onValueChanged: wz.setConfigValue("RightClickOrders", (value == 1))
+            value: wz.config.get("RightClickOrders") ? 1 : 0;
+            onValueChanged: wz.config.set("RightClickOrders", (value == 1))
         }
         Widgets.ClickSelect {
             width: parent.width;
             options: [wz.tr("Right Mouse"), wz.tr("Middle Mouse")]
-            value: wz.getConfigValue("MiddleClickRotate") ? 1 : 0;
-            onValueChanged: wz.setConfigValue("MiddleClickRotate", (value == 1))
+            value: wz.config.get("MiddleClickRotate") ? 1 : 0;
+            onValueChanged: wz.config.set("MiddleClickRotate", (value == 1))
         }
     }
 }

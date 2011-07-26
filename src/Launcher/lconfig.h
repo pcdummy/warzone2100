@@ -22,6 +22,14 @@
 
 #include <src/Launcher/confighandler.h>
 
+// TODO: Need a better place for this, the engine will need it.
+enum GAMETYPE {
+    GAMETYPE_CAMPAIGN,
+    GAMETYPE_SINGLEPLAYER,
+    GAMETYPE_MULTIPLAYER,
+    GAMETYPE_MAX // Last!
+};
+
 void config_init();
 
 #endif // __SRC_LAUNCHER_LCONFIG_H__

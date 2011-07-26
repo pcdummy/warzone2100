@@ -32,14 +32,25 @@
 // WzQMLView to get resolutions.
 #include <wzqmlview.h>
 
+#include <confighandler.h>
+
 class QMLWzHelper : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QObject* config READ getConfig CONSTANT)
 public:
     QMLWzHelper(WzQMLView *qmlview) :
         m_view(qmlview)
     {        
     };
+
+    /**
+     * @brief Helper for the property "config".
+     */
+    QObject* getConfig() const
+    {
+        return &config;
+    }
 
     /**
      * @brief Log a message to wzLog.
@@ -70,9 +81,6 @@ public:
      * @return The maps maxplayers or 0 on not found.
      */
     Q_INVOKABLE int setMap(int techlevel, const QString &name);
-
-    Q_INVOKABLE void setConfigValue(const QString &name, const QVariant &value);
-    Q_INVOKABLE QVariant getConfigValue(const QString &name);
 
     Q_INVOKABLE QString getCurrentResolution();
     Q_INVOKABLE QStringList getAvailableResolutions();

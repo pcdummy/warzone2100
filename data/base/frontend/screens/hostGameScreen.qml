@@ -30,10 +30,10 @@ Item {
     property variant    _subScreen
 
     Component.onCompleted: {
-        _alliance = wz.getConfigValue("alliance") == 1 ? true : false
+        _alliance = wz.config.get("alliance") == 1 ? true : false
         
-        map = wz.getConfigValue("mapName")
-        techlevel = wz.getConfigValue("techlevel")
+        map = wz.config.get("mapName")
+        techlevel = wz.config.get("techlevel")
         
         maxPlayers = wz.setMap(techlevel, map)
 
@@ -115,7 +115,7 @@ Item {
                 } else {
                     hostGameScreen._subScreen.destroy();
 
-                    if (wz.getConfigValue("isMultiplayer")) {
+                    if (wz.config.get("gameType") == 2) {
                         passwordButton.state = ""
                         passwordInput.state = ""
                         hostnameInput.state = ""
@@ -158,7 +158,7 @@ Item {
                 hostGameScreen._isHosting = true
                 createMenu("hostGame/players.qml")
                 chatBox.clear()
-                if (wz.getConfigValue("isMultiplayer")) {
+                if (wz.config.get("gameType") == 2) {
                     chatBox.addSystemMessage("You'r game is not listed. This is a dummy, haha!")
                 }
             }
@@ -171,19 +171,19 @@ Item {
             y: 2
             Widgets.SingleLineEdit {
                 id: playername
-                text: wz.getConfigValue("playerName")
+                text: wz.config.get("playerName")
                 maximumLength: 14
 
                 onAccepted: {
-                    if (wz.getConfigValue("playerName") != text) {
-                        if (wz.getConfigValue("isMultiplayer")) {
-                            chatBox.addLine(wz.getConfigValue("playerName") + " -> " + text);
+                    if (wz.config.get("playerName") != text) {
+                        if (wz.config.get("gameType") == 2) {
+                            chatBox.addLine(wz.config.get("playerName") + " -> " + text);
                         }
 
-                        wz.setConfigValue("playerName", text)
+                        wz.config.set("playerName", text)
 
                         if (playersModel.count) {
-                            playersModel.setProperty(wz.getConfigValue("playerIndex"), "name", text)
+                            playersModel.setProperty(wz.config.get("playerIndex"), "name", text)
                         }
                     }
                 }
@@ -206,9 +206,9 @@ Item {
             Widgets.SingleLineEdit {
                 id: hostnameInput
 
-                text: (wz.getConfigValue("isMultiplayer") ? wz.getConfigValue("gameName") : wz.tr("One-Player Skirmish"))
+                text: (wz.config.get("gameType") == 2 ? wz.config.get("gameName") : wz.tr("One-Player Skirmish"))
 
-                state: (wz.getConfigValue("isMultiplayer") ? "" : "off")
+                state: (wz.config.get("gameType") == 2 ? "" : "off")
             }
             Widgets.SingleLineEdit {
                 id: mapInput
@@ -240,7 +240,7 @@ Item {
                 id: passwordInput
                 text: wz.tr("Enter password here")
 
-                state: (wz.getConfigValue("isMultiplayer") ? "" : "off")
+                state: (wz.config.get("gameType") == 2 ? "" : "off")
 
                 Widgets.ImageButton {
                     id: passwordButton
@@ -257,7 +257,7 @@ Item {
                     activeSourceWidth: 22
                     activeSourceHeight: 22
 
-                    state: (wz.getConfigValue("isMultiplayer") ? "" : "off")
+                    state: (wz.config.get("gameType") == 2 ? "" : "off")
 
                     onClicked: {
                         defaultSource: "image://imagemap/icon lock on"
@@ -280,8 +280,8 @@ Item {
                     image2Hover: "image://imagemap/button scavs off hi"
                     image2Active: "image://imagemap/button active"
 
-                    state: wz.getConfigValue("scavengers") ? 2 : 1
-                    onStateChanged: state == 2 ? wz.setConfigValue("scavengers", true) : wz.setConfigValue("scavengers", false)
+                    state: wz.config.get("scavengers") ? 2 : 1
+                    onStateChanged: state == 2 ? wz.config.set("scavengers", true) : wz.config.set("scavengers", false)
                 }
             }
             Widgets.SingleLineEdit {
@@ -297,8 +297,8 @@ Item {
                     image2Hover: "image://imagemap/button fog on hi"
                     image2Active: "image://imagemap/button active"
 
-                    state: wz.getConfigValue("fog") ? 2 : 1
-                    onStateChanged: state == 2 ? wz.setConfigValue("fog", true) : wz.setConfigValue("fog", false)
+                    state: wz.config.get("fog") ? 2 : 1
+                    onStateChanged: state == 2 ? wz.config.set("fog", true) : wz.config.set("fog", false)
                 }
             }
             Widgets.SingleLineEdit {
@@ -317,9 +317,9 @@ Item {
                     image3Hover: "image://imagemap/button fixed teams hi"
                     image3Active: "image://imagemap/button active"
 
-                    state: wz.getConfigValue("alliance") + 1
+                    state: wz.config.get("alliance") + 1
                     onStateChanged: {
-                        wz.setConfigValue("alliance", state - 1)
+                        wz.config.set("alliance", state - 1)
                         state == 2 ? hostGameScreen._alliance = true : false
                     }
                 }
@@ -341,7 +341,7 @@ Item {
                     image3Active: "image://imagemap/button active"
 
                     state: {
-                        var cfg = wz.getConfigValue("power");
+                        var cfg = wz.config.get("power");
                         switch (cfg)
                         {
                             case 400:
@@ -358,7 +358,7 @@ Item {
                         }
                     }
                     onStateChanged: {
-                        wz.setConfigValue("power", (state == 1 ? 400 : (state == 2 ? 700 : 1000)))
+                        wz.config.set("power", (state == 1 ? 400 : (state == 2 ? 700 : 1000)))
                     }
                 }
             }
@@ -378,8 +378,8 @@ Item {
                     image3Hover: "image://imagemap/button full bases hi"
                     image3Active: "image://imagemap/button active"
 
-                    state: wz.getConfigValue("base") + 1
-                    onStateChanged: wz.setConfigValue("base", state - 1)
+                    state: wz.config.get("base") + 1
+                    onStateChanged: wz.config.set("base", state - 1)
                 }
             }
             Widgets.SingleLineEdit {

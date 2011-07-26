@@ -63,8 +63,8 @@ void config_init()
     
 
     // Hostgamescreen
-    config.add("playerName",            CONFTYPE_STRING,    true,   "Player");
-    config.add("gameName",              CONFTYPE_STRING,    true,   "My Game");
+    config.add("playerName",            CONFTYPE_STRING,    true,   _("Player"));
+    config.add("gameName",              CONFTYPE_STRING,    true,   _("My Game"));
     config.add("mapName",               CONFTYPE_STRING,    true,   "Rush"); // Display name.
     config.add("techlevel",             CONFTYPE_INT,       true,   1);
     config.add("scavengers",            CONFTYPE_BOOL,      true,   false);
@@ -115,8 +115,8 @@ void config_init()
     config.add("connectIP",             CONFTYPE_STRING,    false,  "");
 
     // QML/engine vars
-    config.add("isMultiplayer",         CONFTYPE_BOOL,      false,  false);
-    config.add("isHost",                CONFTYPE_BOOL,      false,  true);
+    config.add("gameType",              CONFTYPE_ENUM,      false,  GAMETYPE_CAMPAIGN,  GAMETYPE_MAX);
+    config.add("isHost",                CONFTYPE_BOOL,      false,  false);
     config.add("playerIndex",           CONFTYPE_INT,       false,  0);
     config.add("fullMapName",           CONFTYPE_STRING,    false,  ""); // a.e.: Sk-Rush-T1
     config.add("mapPath",               CONFTYPE_STRING,    false,  ""); // a.e.: ~/.warzone2100-master/maps/8c-Squared.wz

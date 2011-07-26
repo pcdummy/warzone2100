@@ -44,8 +44,9 @@ enum CONFIGCONTEXT
 };
 
 class ConfigHandlerPrivate;
-class ConfigHandler
+class ConfigHandler : public QObject
 {
+    Q_OBJECT
 public:
     /**
      * @brief Constructor initializes defaults.
@@ -83,8 +84,9 @@ public:
 
     bool add(const QString key, CONFOPTION_TYPES type, bool storeUserConf, QVariant defaultValue, qint32 maxValue = 0);
 
-    bool set(const QString key, QVariant value, bool store = true);
-    const QVariant& get(const QString key);
+    Q_INVOKABLE bool set(const QString key, QVariant value, bool store = true);
+    
+    Q_INVOKABLE QVariant get(const QString key);
 
 private:
     ConfigHandlerPrivate* m_d;

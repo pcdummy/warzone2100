@@ -49,14 +49,14 @@ Item {
         Widgets.ClickSelect {
             width: parent.width
             options: [wz.tr("Easy"), wz.tr("Normal"), wz.tr("Hard"), wz.tr("Tough"), wz.tr("Killer")]
-            value: wz.getConfigValue("difficulty")
-            onValueChanged: wz.setConfigValue("difficulty", value)
+            value: wz.config.get("difficulty")
+            onValueChanged: wz.config.set("difficulty", value)
         }
         Widgets.Slider {
             width: parent.width
             maximum: 16
-            value: wz.getConfigValue("scroll") / 100
-            onValueChanged: wz.setConfigValue("scroll", value * 100)
+            value: wz.config.get("scroll") / 100
+            onValueChanged: wz.config.set("scroll", value * 100)
         }
         Widgets.ImageSelectV2 {
             id: color
@@ -94,8 +94,8 @@ Item {
                 }
             }
 
-            value: wz.getConfigValue("colour")
-            onValueChanged: wz.setConfigValue("colour", value)
+            value: wz.config.get("colour")
+            onValueChanged: wz.config.set("colour", value)
         }
         Widgets.LargeText {
             id: languageButton
@@ -116,8 +116,8 @@ Item {
         Widgets.ClickSelect {
             width: parent.width;
             options: [wz.tr("Fixed"), wz.tr("Rotating")]
-            value: wz.getConfigValue("rotateRadar") ? 1 : 0;
-            onValueChanged: wz.setConfigValue("rotateRadar", (value == 1))
+            value: wz.config.get("rotateRadar") ? 1 : 0;
+            onValueChanged: wz.config.set("rotateRadar", (value == 1))
         }
     }
 }
