@@ -42,8 +42,6 @@
 
 int main(int argc, char *argv[])
 {
-    QString tmpstr;
-    
     QApplication app(argc, argv);
 
     QStringList args = app.arguments();
@@ -97,62 +95,62 @@ int main(int argc, char *argv[])
     {
         return EXIT_FAILURE;
     }   
-   
-    tmpstr = config.get("loadModGlobal").toString();
-    if (!tmpstr.isEmpty())
+
+    QStringList tmpStringlist;
+    tmpStringlist = config.get("loadModGlobal").toStringList();
+    if (!tmpStringlist.isEmpty())
     {
-        tmpstr = FileSystem::haveMod(FileSystem::GAMEMOD_GLOBAL, tmpstr);
-        if (tmpstr.isEmpty())
+        foreach(QString mod, tmpStringlist)
         {
-            wzLog(LOG_ERROR) << QString("The global mod \"%1\" does not exists.")
-                                    .arg(tmpstr);
-            config.set("loadModGlobal", QVariant(""));
-        }
-        else
-        {
-            wzLog(LOG_INFO) << QString("Global mod \"%1\" enabled.")
-                                    .arg(tmpstr);
-            config.set("loadModGlobal", QVariant(tmpstr));
+            if (!FileSystem::loadMod(FileSystem::GAMEMOD_GLOBAL, mod))
+            {
+                wzLog(LOG_ERROR) << QString("The global mod \"%1\" does not exists.")
+                                        .arg(mod);
+            }
+            else
+            {
+                wzLog(LOG_INFO) << QString("Global mod \"%1\" enabled.")
+                                        .arg(mod);
+            }
         }
     }
 
-    tmpstr = config.get("loadModSP").toString();
-    if (!tmpstr.isEmpty())
+    tmpStringlist = config.get("loadModSP").toStringList();
+    if (!tmpStringlist.isEmpty())
     {
-        tmpstr = FileSystem::haveMod(FileSystem::GAMEMOD_CAMPAIGN, tmpstr);
-        if (tmpstr.isEmpty())
+        foreach(QString mod, tmpStringlist)
         {
-            wzLog(LOG_ERROR) << QString("The campaign mod \"%1\" does not exists.")
-                                    .arg(tmpstr);
-            config.set("loadModSP", QVariant(""));
-        }
-        else
-        {
-            wzLog(LOG_INFO) << QString("Campaign mod \"%1\" enabled.")
-                                    .arg(tmpstr);
-            config.set("loadModGlobal", QVariant(tmpstr));
+            if (!FileSystem::loadMod(FileSystem::GAMEMOD_CAMPAIGN, mod))
+            {
+                wzLog(LOG_ERROR) << QString("The campaign mod \"%1\" does not exists.")
+                                        .arg(mod);
+            }
+            else
+            {
+                wzLog(LOG_INFO) << QString("campaign mod \"%1\" enabled.")
+                                        .arg(mod);
+            }
         }
     }
 
-    tmpstr = config.get("loadModMP").toString();
-    if (!tmpstr.isEmpty())
+    tmpStringlist = config.get("loadModMP").toStringList();
+    if (!tmpStringlist.isEmpty())
     {
-        tmpstr = FileSystem::haveMod(FileSystem::GAMEMOD_MULTIPLAY, tmpstr);
-        if (tmpstr.isEmpty())
+        foreach(QString mod, tmpStringlist)
         {
-            wzLog(LOG_ERROR) << QString("The multiplayer mod \"%1\" does not exists.")
-                                    .arg(tmpstr);
-            config.set("loadModMP", QVariant(""));
-        }
-        else
-        {
-            wzLog(LOG_INFO) << QString("Multiplayer mod \"%1\" enabled.")
-                                    .arg(tmpstr);
-            config.set("loadModMP", QVariant(tmpstr));
+            if (!FileSystem::loadMod(FileSystem::GAMEMOD_MULTIPLAY, mod))
+            {
+                wzLog(LOG_ERROR) << QString("The multiplayer mod \"%1\" does not exists.")
+                                        .arg(mod);
+            }
+            else
+            {
+                wzLog(LOG_INFO) << QString("Multiplayer mod \"%1\" enabled.")
+                                        .arg(mod);
+            }
         }
     }
-    
-    tmpstr.clear();
+    tmpStringlist.clear();
 
     /*** Initialize translations ***/
     initI18n();
@@ -189,4 +187,5 @@ int main(int argc, char *argv[])
     app.exec();
 
     config.storeConfig("wz::config", CONFCONTEXT_USER);
+    config.storeConfig("wz::engine.conf", CONFCONTEXT_ENGINE);
 }

@@ -26,6 +26,8 @@
 
 #include <src/Launcher/confighandler.h>
 
+#include <QtCore/QStringList>
+
 #include <lib/framework/frame.h>
 
 //////
@@ -229,7 +231,7 @@ static const struct poptOption* getOptionsTable(void)
     {
         { "configdir",  '\0', POPT_ARG_STRING, NULL, CLI_CONFIGDIR,  N_("Set configuration directory"),       N_("configuration directory") },
         { "datadir",    '\0', POPT_ARG_STRING, NULL, CLI_DATADIR,    N_("Set default data directory"),        N_("data directory") },
-        { "debug",      '\0', POPT_ARG_STRING, NULL, CLI_DEBUG,      N_("Show debug for given level"),        N_("debug level") },
+        { "debug",      '\0', POPT_ARG_STRING, NULL, CLI_DEBUG,      N_("Show debug for given level(s)"),     N_("debug level") },
         { "debugfile",  '\0', POPT_ARG_STRING, NULL, CLI_DEBUGFILE,  N_("Log debug output to file"),          N_("file") },
         { "flush-debug-stderr", '\0', POPT_ARG_NONE, NULL, CLI_FLUSHDEBUGSTDERR, N_("Flush all debug output written to stderr"), NULL },
         { "fullscreen", '\0', POPT_ARG_NONE,   NULL, CLI_FULLSCREEN, N_("Play in fullscreen mode"),           NULL },
@@ -315,6 +317,7 @@ bool ParseCommandLineEarly(int argc, const char** argv)
             qFatal("Unrecognized option: %s", poptBadOption(poptCon, 0));
         }
 
+        QStringList levels;
         switch (option)
         {
             case CLI_DEBUG:
@@ -322,13 +325,17 @@ bool ParseCommandLineEarly(int argc, const char** argv)
                 token = poptGetOptArg(poptCon);
                 if (token == NULL)
                 {
-                    qFatal("Usage: --debug=<flag>");
+                    qFatal("Usage: --debug=<flag[,flag,flag]>");
                 }
 
-                // Attempt to enable the given debug section
-                if (!Logger::instance().setLevelStatus(QString(token).toLower(), true))
+                levels = QString(token).split(",");
+                foreach(QString level, levels)
                 {
-                    qFatal("Debug flag \"%s\" not found!", token);
+                    // Attempt to enable the given debug section
+                    if (!Logger::instance().setLevelStatus(level.toLower(), true))
+                    {
+                        qFatal("Debug flag \"%s\" not found!", token);
+                    }
                 }
                 break;
 
@@ -400,6 +407,8 @@ bool ParseCommandLine(int argc, const char** argv)
     {
         const char* token;
         CLI_OPTIONS option = (CLI_OPTIONS)iOption;
+
+        QStringList mods;
         
         switch (option)
         {
@@ -462,8 +471,8 @@ bool ParseCommandLine(int argc, const char** argv)
                 {
                     qFatal("Missing mod name?");
                 }
-
-                config.set("loadModGlobal", token, false);
+                mods = QString(token).split(",");
+                config.set("loadModGlobal", mods, false);
                 break;
 
             case CLI_MOD_CA:
@@ -473,8 +482,8 @@ bool ParseCommandLine(int argc, const char** argv)
                 {
                     qFatal("Missing mod name?");
                 }
-
-                config.set("loadModSP", token, false);
+                mods = QString(token).split(",");
+                config.set("loadModSP", mods, false);
                 break;
 
             case CLI_MOD_MP:
@@ -484,8 +493,8 @@ bool ParseCommandLine(int argc, const char** argv)
                 {
                     qFatal("Missing mod name?");
                 }
-
-                config.set("loadModMP", token, false);
+                mods = QString(token).split(",");
+                config.set("loadModMP", mods, false);
                 break;
 
             case CLI_RESOLUTION:

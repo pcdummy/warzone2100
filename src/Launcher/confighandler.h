@@ -34,7 +34,8 @@ enum CONFOPTION_TYPES
     CONFTYPE_INT,
     CONFTYPE_BOOL,
     CONFTYPE_STRING,
-    CONFTYPE_ENUM // int bounds checked
+    CONFTYPE_ENUM, // int bounds checked
+    CONFTYPE_STRINGLIST
 };
 
 enum CONFIGCONTEXT
@@ -68,7 +69,7 @@ public:
      *
      * @param filename      Users ini config path.
      *
-     * @return Success/Failure
+     * @return Success/Failure.
      */
     bool loadConfig(const QString &filename);
 
@@ -78,12 +79,32 @@ public:
      * @param filename      Users ini config path.
      * @param context       Config context to store.
      *
-     * @return Success/Failure
+     * @return Success/Failure.
      */
     bool storeConfig(const QString& filename, CONFIGCONTEXT context = CONFCONTEXT_USER);
 
+    /**
+     * @brief Registers a config value.
+     *
+     * @param key           The key, must be unique.
+     * @param type          Values type, one of CONFOPTION_TYPES.
+     * @param storeUserConf Store this value in the users configuration?
+     * @param defaultValue  Default, returned by get() if not overwritten by set().
+     * @param maxValue      For CONFTYPE_ENUM the upper bound to allow.
+     *
+     * @return Success/Failure.
+     */
     bool add(const QString key, CONFOPTION_TYPES type, bool storeUserConf, QVariant defaultValue, qint32 maxValue = 0);
 
+    /**
+     * @brief Sets a config value, does some type and bounds checking.
+     *
+     * @param key           The key.
+     * @param value         The value, will be checked for the type and bounds.
+     * @param store         Store this value in the users configuration or just in the engines config?
+     *
+     * @return  Success/Failure.
+     */
     Q_INVOKABLE bool set(const QString key, QVariant value, bool store = true);
     
     Q_INVOKABLE QVariant get(const QString key);

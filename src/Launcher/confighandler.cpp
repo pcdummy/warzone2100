@@ -175,6 +175,14 @@ Q_INVOKABLE bool ConfigHandler::set(const QString key, QVariant value, bool stor
                 return false;
             }
         break;
+
+        case CONFTYPE_STRINGLIST:
+            if (!value.convert(QVariant::StringList))
+            {
+                wzLog(LOG_ERROR) << key << "must be a stringlist, not:" << value;
+                return false;
+            }
+        break;
     }
 
     m_d->engineConfig.insert(key, value);

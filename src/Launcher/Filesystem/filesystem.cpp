@@ -54,9 +54,6 @@ static MOD_LIST mods_campaign;
 static MOD_LIST mods_multiplay;
 static MOD_LIST mods_loaded;
 
-// Commandline supplied/persitant mods.
-static QMap<const char*, GAMEMOD_TYPE> mods_persistant;
-
 // Flag to detect if any map is in the searchpath.
 // This is required as mods needs to be loaded before any maps.
 static bool mapLoaded = false;
@@ -85,7 +82,6 @@ static bool rebuildSearchPath( searchPathMode mode, bool force = false);
 
 static void findMods(MOD_LIST& modList, const char* subdir);
 static void findAvailableMods(bool forceReload = false);
-static bool loadPersistantMods(searchPathMode mode);
 
 bool init(const QString &binpath, const char* appSubDir, const QString &cmdUserConfigdir)
 {
@@ -157,14 +153,12 @@ void shutdown()
     PHYSFS_deinit();
 }
 
-bool setSearchPathMode(searchPathMode mode)
+void setSearchPathMode(searchPathMode mode)
 {
     unloadMaps();
     unloadMods();
 
     rebuildSearchPath(mode);
-
-    return loadPersistantMods(mode);
 }
 
 bool scanDataDirs(const QString &cmdDataDir, const QString &fallbackDir)
@@ -666,32 +660,6 @@ static void findAvailableMods(bool forceReload)
     modListLoaded = true;
 }
 
-QString haveMod(GAMEMOD_TYPE type, const QString& mod, bool reloadList)
-{
-    findAvailableMods(reloadList);
-
-    MOD_LIST list;
-    switch(type)
-    {
-        case GAMEMOD_GLOBAL:
-            list = mods_global;
-        break;
-        case GAMEMOD_CAMPAIGN:
-            list = mods_campaign;
-        break;
-        case GAMEMOD_MULTIPLAY:
-            list = mods_multiplay;
-        break;
-    }
-
-    if (!list.contains(mod))
-    {
-        return QString();
-    }
-
-    return list[mod];
-}
-
 bool loadMod(GAMEMOD_TYPE type, const QString& mod, bool reloadList)
 {
     if (mapLoaded)
@@ -724,16 +692,10 @@ bool loadMod(GAMEMOD_TYPE type, const QString& mod, bool reloadList)
     if (!list.contains(mod) ||
          PHYSFS_mount(list.value(mod).toUtf8().constData(), NULL, PHYSFS_APPEND) == 0)
     {
-        wzLog(LOG_ERROR) << QString("Failed to load mod \"%1\", error: %2")
-                                    .arg(mod)
-                                    .arg(PHYSFS_getLastError());
         return false;
     }
 
     mods_loaded.insert(mod, list.value(mod));
-    wzLog(LOG_INFO) << QString("Enabled %1 mod: %2.")
-                            .arg(typeString).arg(mod);
-
     return true;
 }
 
@@ -752,32 +714,6 @@ void unloadMods()
 const QStringList getLoadedMods()
 {
     return mods_loaded.keys();
-}
-
-void addPersistantMod(GAMEMOD_TYPE type, const char* mod)
-{
-    mods_persistant.insert(mod, type);
-}
-
-static bool loadPersistantMods(searchPathMode mode)
-{
-    QMapIterator<const char*, GAMEMOD_TYPE> i(mods_persistant);
-
-    while (i.hasNext())
-    {
-        // Ignore either Singleplayer or multiplayer mods.
-        if (i.value() != GAMEMOD_GLOBAL && i.value() != mode)
-        {
-            continue;
-        }
-
-        if (!loadMod(i.value(), i.key()))
-        {
-            return false;
-        }
-    }
-
-    return true;
 }
 
 } // namespace FileSystem {

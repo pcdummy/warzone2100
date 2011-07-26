@@ -72,10 +72,8 @@ void shutdown();
  * @brief Clean the path, build to mode and (re)load its persistant mods.
  *
  * @param mode      Mode to build to.
- *
- * @return Success/Failure.
  */
-bool setSearchPathMode(searchPathMode mode);
+void setSearchPathMode(searchPathMode mode);
 
 
 /**
@@ -94,17 +92,6 @@ bool loadMap(const char *path);
  * @brief Unloads all maps from the searchpath and resets the search mode.
  */
 void unloadMaps();
-
-/**
- * @brief Checks if the mod exists.
- *
- * @param type  Gametype (global, campaign or multiplay)
- * @param mod   mod name (as example: old-1.10-balance.wz)
- * @param reloadList Force a redetect.
- *
- * @return Mod path or empty string.
- */
-QString haveMod(GAMEMOD_TYPE type, const QString& mod, bool reloadList = false);
 
 /**
  * @brief Detects mods and loads them.
@@ -126,11 +113,6 @@ void unloadMods();
  * @brief Returns a list of mods.
  */
 const QStringList getLoadedMods();
-
-/**
- * @brief Add a persistant/cmd line mod.
- */
-void addPersistantMod(GAMEMOD_TYPE type, const char* mod);
 
 /**
  * @brief Prints the current search path (for debugging).

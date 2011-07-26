@@ -20,6 +20,8 @@
 // self
 #include <src/Launcher/lconfig.h>
 
+#include <QtCore/QStringList>
+
 // For init_config() - FSAA_MAX and FMV_MAX
 #include <src/warzoneconfig.h>
 // For init_config() - SCANLINES_BLACK
@@ -109,9 +111,9 @@ void config_init()
     config.add("saveGame",              CONFTYPE_STRING,    false,  "");
     config.add("game",                  CONFTYPE_STRING,    false,  "");
 
-    config.add("loadModGlobal",         CONFTYPE_STRING,    false,  "");
-    config.add("loadModSP",             CONFTYPE_STRING,    false,  "");
-    config.add("loadModMP",             CONFTYPE_STRING,    false,  "");
+    config.add("loadModGlobal",         CONFTYPE_STRINGLIST,    false,  QStringList());
+    config.add("loadModSP",             CONFTYPE_STRINGLIST,    false,  QStringList());
+    config.add("loadModMP",             CONFTYPE_STRINGLIST,    false,  QStringList());
     config.add("connectIP",             CONFTYPE_STRING,    false,  "");
 
     // QML/engine vars
