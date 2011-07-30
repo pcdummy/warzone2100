@@ -54,10 +54,6 @@ static MOD_LIST mods_campaign;
 static MOD_LIST mods_multiplay;
 static MOD_LIST mods_loaded;
 
-// Flag to detect if any map is in the searchpath.
-// This is required as mods needs to be loaded before any maps.
-static bool mapLoaded = false;
-
 static searchPathMode currentSearchMode = mod_clean;
 // To remember the last used searchpath when detecting maps.
 static searchPathMode lastSearchMode = mod_clean;
@@ -145,7 +141,7 @@ bool init(const QString &binpath, const char* appSubDir, const QString &cmdUserC
     return true;
 }
 
-void shutdown()
+void exit()
 {
     unloadMaps();
     unloadMods();
@@ -562,10 +558,14 @@ bool loadMap(const char *path)
     {
         return false;
     }
-    mapLoaded = true;
-
     return true;
 }
+
+bool unLoadMap(const char *path)
+{
+    return PHYSFS_removeFromSearchPath(path) == 0;
+}
+
 
 void unloadMaps()
 {
@@ -581,7 +581,6 @@ void unloadMaps()
     }
 
     rebuildSearchPath(lastSearchMode);
-    mapLoaded = false;
 }
 
 static void findMods(MOD_LIST& modList, const char* subdir)
@@ -662,12 +661,6 @@ static void findAvailableMods(bool forceReload)
 
 bool loadMod(GAMEMOD_TYPE type, const QString& mod, bool reloadList)
 {
-    if (mapLoaded)
-    {
-        wzLog(LOG_ERROR) << "Cannot load a mod while a map has been loaded.";
-        return false;
-    }
-
     findAvailableMods(reloadList);
 
     MOD_LIST list;

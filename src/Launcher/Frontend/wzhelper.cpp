@@ -23,9 +23,6 @@
 #include "QtCore/QVariant"
 #include "QtCore/QString"
 
-// Map list
-#include <src/Launcher/Map/map.h>
-
 // Configuration
 #include "confighandler.h"
 
@@ -37,63 +34,75 @@
 
 namespace Frontend {
 
-Q_INVOKABLE void WzHelper::logVariant(const QVariant &message)
+WzHelper::WzHelper(WzQMLView* qmlview):
+		QObject(qmlview),
+        m_view(qmlview),
+        m_maplist(new Map::List)
+{
+}
+
+WzHelper::~WzHelper()
+{
+	delete m_maplist;
+}
+	
+void WzHelper::logVariant(const QVariant &message)
 {
     wzLog(LOG_FRONTEND) << message;
 }
 
-Q_INVOKABLE void WzHelper::log(const QString &message)
+void WzHelper::log(const QString &message)
 {
     wzLog(LOG_FRONTEND) << message;
 }
 
-Q_INVOKABLE QString WzHelper::tr(const QString& text)
+QString WzHelper::tr(const QString& text)
 {
     return QString::fromUtf8(_(text.toUtf8().constData()));
 }
 
-Q_INVOKABLE QVariantMap WzHelper::getMapList(int techlevel)
+QVariantMap WzHelper::getMapList(int mapType)
 {
-    switch (techlevel)
-    {
-        case 1:
-            return Map::getList(Map::GAMETYPE_SKIRMISH_T1);
-        break;
-        case 2:
-            return Map::getList(Map::GAMETYPE_SKIRMISH_T2);
-        break;
-        case 3:
-            return Map::getList(Map::GAMETYPE_SKIRMISH_T3);
-        break;
-    }
+	if (mapType < 0)
+	{
+		wzLog(LOG_FRONTEND) << "Invalid mapType:" << mapType;
+		return QVariantMap();
+	}
+	
+	QList<Map::Map*> list = m_maplist->getList();
+	QVariantMap result;
 
-    return Map::getList(Map::GAMETYPE_SKIRMISH_T1);
+	wzLog(LOG_FRONTEND) << "Finding maps for type:" << mapType;
+	for (int i = 0; i < list.size(); ++i)
+	{
+		Map::Map* map = list.at(i);
+		if (map->supportsType(mapType))
+		{
+			wzLog(LOG_FRONTEND) << "\t" << map->getName() << map->supportedTypes();
+			result.insert(map->getName(), map->getMaxPlayers());
+		}
+	}
+
+	return result;
 }
 
-Q_INVOKABLE int WzHelper::setMap(int techlevel, const QString &name)
+int WzHelper::setMap(int mapType, QString name)
 {
-    QVariantMap entry = getMapList(techlevel).value(name).toMap();
-
-    if (entry.isEmpty())
-    {
-        return 0;
-    }
-    
-    config.set("mapName", name);
-    config.set("techlevel", techlevel);
-    config.set("fullMapName", entry["name"]);
-    config.set("mapPath", entry["path"]);
-
-    return entry["players"].toInt();
+	if (mapType < 0)
+	{
+		wzLog(LOG_FRONTEND) << "Invalid mapType:" << mapType;
+		return 0;
+	}
+	return m_maplist->setMap(mapType, name);
 }
 
-Q_INVOKABLE QString WzHelper::getCurrentResolution()
+QString WzHelper::getCurrentResolution()
 {
     return QString("%1 x %2").arg(config.get("width").toInt())
                              .arg(config.get("height").toInt());
 }
 
-Q_INVOKABLE QStringList WzHelper::getAvailableResolutions()
+QStringList WzHelper::getAvailableResolutions()
 {
     if (!m_view)
     {
@@ -103,7 +112,7 @@ Q_INVOKABLE QStringList WzHelper::getAvailableResolutions()
     return m_view->getAvailableResolutions();
 }
 
-Q_INVOKABLE void WzHelper::setResolution(const QString& resolution)
+void WzHelper::setResolution(const QString& resolution)
 {
     QStringList res = resolution.split(" x ");
     if (res.size() != 2)
@@ -116,12 +125,12 @@ Q_INVOKABLE void WzHelper::setResolution(const QString& resolution)
     config.set("height", res.at(1));
 }
 
-Q_INVOKABLE QString WzHelper::getLanguage()
+QString WzHelper::getLanguage()
 {
     return getLanguageName();
 }
 
-Q_INVOKABLE QString WzHelper::setNextLanguage()
+QString WzHelper::setNextLanguage()
 {
     ::setNextLanguage();
     config.set("language", ::getLanguage());

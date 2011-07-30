@@ -31,14 +31,14 @@
 // Imagemap
 #include <lib/imagemap/loader.h>
 
-// Configuration will be registered
-#include <confighandler.h>
-
 // Image map to qml proxy.
 #include "imageprovider.h"
 
-// wzHelper - QML Helper
+// WzHelper - QML<->C++ Helper, gets registered as WZ
 #include "wzhelper.h"
+
+// Configuration
+#include <confighandler.h>
 
 // Qt Gui for the quit signal.
 #include <QtGui/QApplication>

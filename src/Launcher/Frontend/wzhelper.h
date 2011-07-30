@@ -28,10 +28,12 @@
 #include <QtCore/QObject>
 #include <QtCore/QVariantMap>
 #include <QtCore/QString>
-#include <QtCore/QStringList>
 
 // QML_DECLARE_TYPE Macro
 #include <QtDeclarative/qdeclarative.h>
+
+// Map List
+#include <src/Launcher/Map/map.h>
 
 // Configuration
 #include <confighandler.h>
@@ -39,38 +41,55 @@
 // GAMETYPE enum
 #include <lconfig.h>
 
+namespace Map
+{
+	class Map;
+}
+
 namespace Frontend {
 
 // Forwarder
 class WzQMLView;
-    
+
 class WzHelper : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QObject* config READ getConfig CONSTANT)
+    Q_PROPERTY(QObject *config READ getConfig CONSTANT)
+	Q_ENUMS(Gametype)
+	Q_ENUMS(Techlevel)
 public:
-    WzHelper(WzQMLView* qmlview = 0) :
-        m_view(qmlview) {}
+    WzHelper(WzQMLView* qmlview = 0);
 
-    virtual ~WzHelper() {};
+    virtual ~WzHelper();
 
     WzHelper(const WzHelper& copy) : QObject() {};
 
     /**
      * @brief Helper for the property "config".
      */
-    QObject* getConfig() const
+    inline QObject* getConfig() const
     {
         return &config;
     }
 
-    Q_ENUMS(Gametype)
+    QObject* getMapList() const;
+
     enum Gametype {
         Campaign = GAMETYPE_CAMPAIGN,
         SinglePlayer = GAMETYPE_SINGLEPLAYER,
         Multiplayer = GAMETYPE_MULTIPLAYER
     };
-    
+
+	enum Techlevel
+	{
+		Techlevel_NONE = Map::CA_NONE,
+		Techlevel_1 = Map::MP_SKIRMISH_T1,
+		Techlevel_2 = Map::MP_SKIRMISH_T2,
+		Techlevel_3 = Map::MP_SKIRMISH_T3
+	};
+	Q_INVOKABLE QVariantMap getMapList(int mapType);
+	Q_INVOKABLE int setMap(int mapType, QString name);
+
     /**
      * @brief Log a message to wzLog.
      */
@@ -82,38 +101,22 @@ public:
      */
     Q_INVOKABLE QString tr(const QString &message);
 
-    /**
-     * @brief Calls Map::getMapList(techlevel) and returns its result.
-     *
-     * @see Map::getMapList() for the resulting format.
-     *
-     * TODO: Should use ENUM's here
-     */
-    Q_INVOKABLE QVariantMap getMapList(int techlevel);
-
-    /**
-     * @brief Sets the map in the configuration.
-     *
-     * @param techlevel     Tech level 1-3
-     * @param name          Shortened map name.
-     *
-     * @return The maps maxplayers or 0 on not found.
-     */
-    Q_INVOKABLE int setMap(int techlevel, const QString &name);
-
     Q_INVOKABLE QString getCurrentResolution();
     Q_INVOKABLE QStringList getAvailableResolutions();
     Q_INVOKABLE void setResolution(const QString &resolution);
 
     Q_INVOKABLE QString getLanguage();
     Q_INVOKABLE QString setNextLanguage();
+	
 private:
     WzQMLView* m_view;
+	Map::List* m_maplist;
 };
 
 } // namespace Frontend {
 
 Q_DECLARE_METATYPE(Frontend::WzHelper::Gametype)
+Q_DECLARE_METATYPE(Frontend::WzHelper::Techlevel)
 QML_DECLARE_TYPE(Frontend::WzHelper)
 
 #endif // LAUNCHER_QMLWZHELPER_H

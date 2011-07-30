@@ -32,6 +32,8 @@
 #include "src/multiplay.h"
 // For init_config() - DL_NORMAL, DL_KILLER
 #include "src/difficulty.h"
+// For init_config() - Map::MP_SKIRMISH_T1
+#include "src/Launcher/Map/map.h"
 
 void config_init()
 {
@@ -68,7 +70,7 @@ void config_init()
     config.add("playerName",            CONFTYPE_STRING,    true,   _("Player"));
     config.add("gameName",              CONFTYPE_STRING,    true,   _("My Game"));
     config.add("mapName",               CONFTYPE_STRING,    true,   "Rush"); // Display name.
-    config.add("techlevel",             CONFTYPE_INT,       true,   1);
+    config.add("techlevel",             CONFTYPE_INT,       true,   Map::MP_SKIRMISH_T1);
     config.add("scavengers",            CONFTYPE_BOOL,      true,   false);
     config.add("visfog",                CONFTYPE_BOOL,      true,   false);
     config.add("fog",                   CONFTYPE_BOOL,      true,   false);       // Not sure whats that good for - Fast    

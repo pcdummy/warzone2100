@@ -21,6 +21,9 @@
 // compiler fixes + logging + i18n
 #include <lib/framework/frame.h>
 
+// setupExceptionHandler
+#include <lib/exceptionhandler/exceptionhandler.h>
+
 // Subdirectory in users home/documents
 // TODO: Let ./configure handle this
 #if defined(Q_OS_WIN)
@@ -30,6 +33,8 @@
 #else
 # define WZ_WRITEDIR ".warzone2100-master"
 #endif
+
+#include "src/Launcher/Map/map.h"
 
 /* Always use fallbacks on Windows */
 #if defined(WZ_OS_WIN)
@@ -63,6 +68,8 @@ int main(int argc, char *argv[])
         utfargv[i] = strdup(args.at(i).toUtf8().constData()); 
     }
 
+    setupExceptionHandler(utfargc, utfargv, "Warzone 2100 - Launcher 0.0.0");
+
     // Setup debugging cmd options.
     if (!ParseCommandLineEarly(utfargc, utfargv))
     {
@@ -71,7 +78,7 @@ int main(int argc, char *argv[])
     
     if (cmdShowVersion)
     {
-        printf("%s", "Warzone 2100 launcher\n");
+        printf("%s", "Warzone 2100 - Launcher 0.0.0\n");
         // printf("Warzone 2100 - %s\n", version_getFormattedVersionString());
         return EXIT_SUCCESS;
     }    
@@ -152,6 +159,8 @@ int main(int argc, char *argv[])
     }
     tmpStringlist.clear();
 
+    FileSystem::printSearchPath();
+
     /*** Initialize translations ***/
     initI18n();
     wzLog(LOG_MAIN) << QString("Using language: %1").arg(getLanguage());
@@ -187,5 +196,7 @@ int main(int argc, char *argv[])
     app.exec();
 
     config.storeConfig("wz::config", CONFCONTEXT_USER);
-    config.storeConfig("wz::engine.conf", CONFCONTEXT_ENGINE);
+
+    FileSystem::exit();
+    debug_exit();
 }

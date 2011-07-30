@@ -2,48 +2,103 @@
 #define CORE_MAP_MAP_H
 
 // Qt Core
-#include <QtCore/QVariantMap>
+#include <QtCore/QList>
+#include <QtCore/QString>
+#include <QtCore/QStringList>
+
+#include "lib/framework/frame.h"
 
 extern const int LOG_LMAP;
 
 namespace Map {
 
-enum GAMETYPES {
-    GAMETYPE_CAMPAIGN_T1 = 12,
-    GAMETYPE_CAMPAIGN_T2 = 15,
-    GAMETYPE_CAMPAIGN_T3 = 16,
-    GAMETYPE_SKIRMISH_T1 = 14,
-    GAMETYPE_SKIRMISH_T2 = 18,
-    GAMETYPE_SKIRMISH_T3 = 19
+enum Type
+{
+	CA_COMPLETE,		///< all data required for a stand alone level
+	CA_CAMPAIGN,		///< the data set for a campaign (no map data)
+	CA_CAMSTART,		///< mapdata for the start of a campaign
+	CA_CAMCHANGE,		///< data for changing between levels
+	CA_EXPAND,			///< extra data for expanding a campaign map
+	CA_BETWEEN,			///< pause between missions
+	CA_MKEEP,			///< off map mission (extra map data)
+	CA_MCLEAR,			///< off map mission (extra map data)
+	CA_EXPAND_LIMBO,	///< expand campaign map using droids held in apsLimboDroids
+	CA_MKEEP_LIMBO,		///< off map saving any droids (selectedPlayer) at end into apsLimboDroids
+	CA_NONE,			///< flags when not got a mission to go back to or
+						///< when already on one.
+	MP_MAP,				///< A type higher this is a multiplayer map
+	MP_CAMPAIGN_T1,		///<
+	MP_TEAMPLAY,		///< Do not use.
+	MP_SKIRMISH_T1,
+	MP_CAMPAIGN_T2,
+	MP_CAMPAIGN_T3,
+	MP_UNKNOWN,			///< Do not use.
+	MP_SKIRMISH_T2,
+	MP_SKIRMISH_T3
 };
 
-/**
- * @brief Clear the internal maplists.
- */
-void clearList();
+class MapPrivate;
+class Map
+{
+public:
+	Map(QString &name, uint8_t type);
+	
+	virtual ~Map();
 
-/**
- * @brief Returns a list of maps for the given GAMETYPE.
- *
- * Returns a QVariantMap with found maps, current format:
- *
- * [(string)<short-mapname>: {name: (string)<long-mapname>,
- *                            players: (int)<max-players>,
- *                            path: (string)<zip-file-path>
- *                           },
- * ]
- *
- * @param gameType          Gametype to retreive maps for.
- *
- * @return                  QVariantMap.
- */
-QVariantMap& getList(GAMETYPES gameType = GAMETYPE_SKIRMISH_T1);
+	qint8 getType() const;
+	const QString getName() const;
 
-/**
- * @brief Adds a map to the searchpath, unloads any previously loaded maps.
- */
-bool loadMap(const QString &path);
+	void setPath(QString path);
+	const QString getPath() const;
 
-} // namespace Map {
+	void setMaxPlayers(quint8 maxPlayers);
+	quint8 getMaxPlayers() const;
+
+	void setDataset(quint8 type, QStringList &dataset);
+	const QStringList getDataset(quint8 type) const;
+
+	void addDatafile(quint8 type, QString file);
+	QStringList getDatafiles(quint8 type) const;
+
+	QList<quint8> supportedTypes() const;
+	bool supportsType(quint8 type) const;
+
+private:
+	MapPrivate* d;
+};
+
+class ListPrivate;
+class List
+{
+public:
+	List();
+	virtual ~List();
+
+    /**
+     * @brief Sets the map in the configuration.
+     *
+     * @param mapType		Type of map, see the enumartion Type
+	 * 						or use a custome one.
+     * @param name          Shortened map name.
+     *
+     * @return The maps maxplayers or 0 on not found.
+     */
+	quint8 setMap(qint8 mapType, const QString &name) const;
+
+	/**
+	 * @brief Tries to find all map in the physfs searchpath and parses them.
+	 *
+	 * This loads addon.lev first,
+	 * then it loads all zipped maps and parses all found .lev files.
+	 *
+	 * @param forceRefresh	Force a refresh of the internal cache.
+	*/
+	const QList<Map*> getList(bool forcerefresh = false) const;
+
+private:
+	ListPrivate* d;
+};
+
+}; // namespace Map {
 
 #endif // #ifndef CORE_MAP_MAP_H

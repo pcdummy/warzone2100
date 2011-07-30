@@ -231,8 +231,9 @@ public:
 #ifdef DEBUG
         if (!fp)
         {
-            wzLog(LOG_ERROR) << QString("Failed to open \"%1\": %2")
-                                .arg(name).arg(PHYSFS_getLastError());
+            wzLog(LOG_ERROR) << "Failed to open" << name
+                             << "with mode:" << mode
+                             << "error:" << PHYSFS_getLastError();
         }
 #endif
 

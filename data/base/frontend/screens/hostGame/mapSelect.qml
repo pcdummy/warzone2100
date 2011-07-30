@@ -1,4 +1,5 @@
 import QtQuick 1.0
+import Warzone 1.0
 import "../../widgets" as Widgets
 
 Item {
@@ -48,15 +49,15 @@ Item {
     function updateMapList()
     {
         mapModel.clear();
-
+		wz.log(hostGameScreen.techlevel);
         var maps = wz.getMapList(hostGameScreen.techlevel);
 
         for (var mapname in maps)
         {
             var mapdata = maps[mapname];
-            if (hostGameScreen.maxPlayers == 0 || mapdata["players"] == hostGameScreen.maxPlayers)
+            if (hostGameScreen.maxPlayers == 0 || mapdata == hostGameScreen.maxPlayers)
             {
-                mapModel.append({"name": mapname, "players2": mapdata["players"]});
+                mapModel.append({"name": mapname, "players2": mapdata});
             }
         }
     }
@@ -64,17 +65,23 @@ Item {
     Component.onCompleted: {
         rightSideText.text = wz.tr("Select Map")
 
-        switch(hostGameScreen.techlevel) {
-            case 1:
-                setTechLevel(_t1, 1, false);
-            break;
-            case 2:
-                setTechLevel(_t2, 2, false);
-            break;
-            case 3:
-                setTechLevel(_t3, 3, false);
-            break;
-        };
+		if (hostGameScreen.techlevel == Wz.Techlevel_1)
+		{
+			setTechLevel(_t1, Wz.Techlevel_1, false);
+		}
+		else if (hostGameScreen.techlevel == Wz.Techlevel_2)
+		{
+			setTechLevel(_t1, Wz.Techlevel_2, false);
+		}
+		else if (hostGameScreen.techlevel == Wz.Techlevel_3)
+		{
+			setTechLevel(_t1, Wz.Techlevel_3, false);
+		}
+		else
+		{
+			wz.log("Unknown techlevel " + hostGameScreen.techlevel)
+			setTechLevel(_t1, Wz.Techlevel_1, false);
+		}
 
         switch(hostGameScreen.maxPlayers) {
             case 0:
@@ -142,9 +149,9 @@ Item {
 
         spacing: 3
 
-        Widgets.SmallTextButton { id: _t1; text: "T1"; onClicked: setTechLevel(_t1, 1); }
-        Widgets.SmallTextButton { id: _t2; text: "T2"; onClicked: setTechLevel(_t2, 2); }
-        Widgets.SmallTextButton { id: _t3; text: "T3"; onClicked: setTechLevel(_t3, 3); }
+        Widgets.SmallTextButton { id: _t1; text: "T1"; onClicked: setTechLevel(_t1, Wz.Techlevel_1); }
+        Widgets.SmallTextButton { id: _t2; text: "T2"; onClicked: setTechLevel(_t2, Wz.Techlevel_2); }
+        Widgets.SmallTextButton { id: _t3; text: "T3"; onClicked: setTechLevel(_t3, Wz.Techlevel_3); }
     }
 
     Component {

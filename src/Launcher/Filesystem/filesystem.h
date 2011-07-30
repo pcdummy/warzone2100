@@ -66,7 +66,7 @@ bool scanDataDirs(const QString &cmdDataDir = QString(), const QString &fallback
 /**
  * @brief Cleanup stuff and deinitalize PHYSFS.
  */
-void shutdown();
+void exit();
 
 /**
  * @brief Clean the path, build to mode and (re)load its persistant mods.
@@ -87,6 +87,13 @@ void loadMaps();
  * @return Success/Failure.
  */
 bool loadMap(const char *path);
+
+/**
+ * @brief Unload a previously loaded map.
+ *
+ * @return Success/Failure.
+ */
+bool unloadMap(const char *path);
 
 /**
  * @brief Unloads all maps from the searchpath and resets the search mode.

@@ -32,17 +32,17 @@ Item {
 
     Component.onCompleted: {
         _alliance = wz.config.get("alliance") == 1 ? true : false
-        
+
         map = wz.config.get("mapName")
         techlevel = wz.config.get("techlevel")
-        
+
         maxPlayers = wz.setMap(techlevel, map)
 
         if (maxPlayers == 0)
         {
             // TODO: Unknown map do something here.
             map = "Rush"
-            techlevel = 1
+            techlevel = Wz.Techlevel_1
             maxPlayers = wz.setMap(techlevel, map)
         }
     }
