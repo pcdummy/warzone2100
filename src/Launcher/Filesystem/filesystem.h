@@ -1,20 +1,20 @@
 /*
-    This file is part of Warzone 2100.
-    Copyright (C) 2011  Warzone 2100 Project
+	This file is part of Warzone 2100.
+	Copyright (C) 2011  Warzone 2100 Project
 
-    Warzone 2100 is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	Warzone 2100 is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    Warzone 2100 is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-    GNU General Public License for more details.
+	Warzone 2100 is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with Warzone 2100; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+	You should have received a copy of the GNU General Public License
+	along with Warzone 2100; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
 #ifndef __SRC_LAUNCHER_FILESYSTEM_FILESYSTEM_H__
@@ -34,9 +34,9 @@ namespace FileSystem {
 
 enum GAMEMOD_TYPE
 {
-    GAMEMOD_GLOBAL,     // Mod for both multiplay and campaign games.
-    GAMEMOD_CAMPAIGN,   // Campaign only mod.
-    GAMEMOD_MULTIPLAY   // Multiplay only mod.
+	GAMEMOD_GLOBAL,	 // Mod for both multiplay and campaign games.
+	GAMEMOD_CAMPAIGN,   // Campaign only mod.
+	GAMEMOD_MULTIPLAY   // Multiplay only mod.
 };
 
 typedef QHash<QString, QString> MOD_LIST;
@@ -44,8 +44,8 @@ typedef QHash<QString, QString> MOD_LIST;
 /**
  * @brief Initalizes Physfs and creates the writedir.
  *
- * @param binpath       Application path - argv[0].
- * @param appSubDir     Subdirectory in platforms Userdir for the Physfs writedir.
+ * @param binpath	   Application path - argv[0].
+ * @param appSubDir	 Subdirectory in platforms Userdir for the Physfs writedir.
  * @param userConfigdir Custom supplied config directory.
  * @param userDataDir   Custom supplied data directory.
  *
@@ -56,7 +56,7 @@ bool init(const QString &binpath, const char* appSubDir, const QString &userConf
 /**
  * @brief Finds the application data and adds it to the search path.
  *
- * @param cmDataDir     User supplied data dir which overwrites ours.
+ * @param cmDataDir	 User supplied data dir which overwrites ours.
  * @param fallbackDir   ?
  *
  * @return Path to the data dir (empty on failure).
@@ -71,7 +71,7 @@ void exit();
 /**
  * @brief Clean the path, build to mode and (re)load its persistant mods.
  *
- * @param mode      Mode to build to.
+ * @param mode	  Mode to build to.
  */
 void setSearchPathMode(searchPathMode mode);
 

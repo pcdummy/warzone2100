@@ -1,3 +1,21 @@
+/*
+	This file is part of Warzone 2100.
+	Copyright (C) 2011  Warzone 2100 Project
+
+	Warzone 2100 is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
+
+	Warzone 2100 is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with Warzone 2100; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+*/
 #ifndef CORE_MAP_MAP_H
 #define CORE_MAP_MAP_H
 
@@ -42,7 +60,7 @@ class Map
 {
 public:
 	Map(QString &name, uint8_t type);
-	
+
 	virtual ~Map();
 
 	qint8 getType() const;
@@ -74,15 +92,15 @@ public:
 	List();
 	virtual ~List();
 
-    /**
-     * @brief Sets the map in the configuration.
-     *
-     * @param mapType		Type of map, see the enumartion Type
+	/**
+	 * @brief Sets the map in the configuration.
+	 *
+	 * @param mapType		Type of map, see the enumartion Type
 	 * 						or use a custome one.
-     * @param name          Shortened map name.
-     *
-     * @return The maps maxplayers or 0 on not found.
-     */
+	 * @param name		  Shortened map name.
+	 *
+	 * @return The maps maxplayers or 0 on not found.
+	 */
 	quint8 setMap(qint8 mapType, const QString &name) const;
 
 	/**

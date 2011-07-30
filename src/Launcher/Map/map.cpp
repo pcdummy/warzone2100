@@ -1,3 +1,21 @@
+/*
+	This file is part of Warzone 2100.
+	Copyright (C) 2011  Warzone 2100 Project
+
+	Warzone 2100 is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
+
+	Warzone 2100 is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with Warzone 2100; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+*/
 // Self
 #include "src/Launcher/Map/map.h"
 #include "map_p.h"
@@ -29,27 +47,27 @@ namespace Map {
 /**
  * @brief Removes the prepending "Sk-" and leading "-T1" from a mapname.
  *
- * @param in    Mapname to shorten.
+ * @param in	Mapname to shorten.
  *
- * @return      result.
+ * @return	  result.
  */
 static inline QString shortenMapname(const char *in)
 {
-    QString out(in);
+	QString out(in);
 
-     // Remove "Sk-"
-    if (out.startsWith("Sk-"))
-    {
-        out.remove(0, 3);
-    }
+	 // Remove "Sk-"
+	if (out.startsWith("Sk-"))
+	{
+		out.remove(0, 3);
+	}
 
-     // Remove -T1|-T2|-T3
-     if (out.right(3).left(2) == "-T")
-     {
-         out.chop(3);
-     }
+	 // Remove -T1|-T2|-T3
+	 if (out.right(3).left(2) == "-T")
+	 {
+		 out.chop(3);
+	 }
 
-     return out;
+	 return out;
 }
 
 class MapPrivate
@@ -147,8 +165,8 @@ public:
 
 void ListPrivate::buildList(bool forcerefresh)
 {
-    char **filelist, **file;
-    ssize_t length;
+	char **filelist, **file;
+	ssize_t length;
 
 	if (forcerefresh)
 	{
@@ -158,28 +176,28 @@ void ListPrivate::buildList(bool forcerefresh)
 	{
 		return;
 	}
-	
+
 	ASSERT(parseLev("addon.lev"), "Failed to parse addon.lev!");
 
-    // Load all maps into the searchpath.
-    FileSystem::loadMaps();
+	// Load all maps into the searchpath.
+	FileSystem::loadMaps();
 
-    filelist = PHYSFS_enumerateFiles("");
-    for (file = filelist; *file != NULL; ++file)
-    {
-        length = strlen(*file);
+	filelist = PHYSFS_enumerateFiles("");
+	for (file = filelist; *file != NULL; ++file)
+	{
+		length = strlen(*file);
 
-        if ((length > 10 && strcmp(*file+(length-10), ".addon.lev") == 0) ||
+		if ((length > 10 && strcmp(*file+(length-10), ".addon.lev") == 0) ||
 			(length > 13 && strcmp(*file+(length-13), ".xplayers.lev") == 0))
-        {
+		{
 			// No need to print errors
 			parseLev(*file);
-        }
-    }
-    PHYSFS_freeList(filelist);
+		}
+	}
+	PHYSFS_freeList(filelist);
 
-    // Unload maps
-    FileSystem::unloadMaps();
+	// Unload maps
+	FileSystem::unloadMaps();
 
 	// We have all datasets assigned, we don't need them anymore.
 	datasets.clear();
@@ -414,7 +432,7 @@ quint8 List::setMap(qint8 mapType, const QString &name) const
 		wzLog(LOG_LMAP) << "Unknown map" << name;
 		return 0;
 	}
-	
+
 	Map* map = d->maps[name.toLower()];
 	if (map->getType() == CA_NONE || !map->supportsType(mapType))
 	{
@@ -432,7 +450,7 @@ quint8 List::setMap(qint8 mapType, const QString &name) const
 const QList<Map*> List::getList(bool forcerefresh) const
 {
 	d->buildList(forcerefresh);
-	
+
 	return d->maps.values();
 }
 

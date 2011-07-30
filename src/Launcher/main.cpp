@@ -1,3 +1,22 @@
+/*
+	This file is part of Warzone 2100.
+	Copyright (C) 2011  Warzone 2100 Project
+
+	Warzone 2100 is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
+
+	Warzone 2100 is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with Warzone 2100; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+*/
+
 // See QString docs for them.
 // TODO: Move to a better place.
 #define QT_USE_FAST_CONCATENATION
@@ -47,156 +66,156 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
+	QApplication app(argc, argv);
 
-    QStringList args = app.arguments();
+	QStringList args = app.arguments();
 
-    // make Qt treat all C strings in Warzone as UTF-8
-    QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
+	// make Qt treat all C strings in Warzone as UTF-8
+	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
 
-    // Sets a basic debugger up.
-    debug_init();
+	// Sets a basic debugger up.
+	debug_init();
 
-    // Initializes default values for the configuration.
-    config_init();
+	// Initializes default values for the configuration.
+	config_init();
 
-    int utfargc = args.size();
-    const char* utfargv[utfargc];
-    for (int i = 0; i < utfargc; i++)
-    {
-        // TODO: Free this memory?
-        utfargv[i] = strdup(args.at(i).toUtf8().constData()); 
-    }
+	int utfargc = args.size();
+	const char* utfargv[utfargc];
+	for (int i = 0; i < utfargc; i++)
+	{
+		// TODO: Free this memory?
+		utfargv[i] = strdup(args.at(i).toUtf8().constData());
+	}
 
-    setupExceptionHandler(utfargc, utfargv, "Warzone 2100 - Launcher 0.0.0");
+	setupExceptionHandler(utfargc, utfargv, "Warzone 2100 - Launcher 0.0.0");
 
-    // Setup debugging cmd options.
-    if (!ParseCommandLineEarly(utfargc, utfargv))
-    {
-        return EXIT_FAILURE;
-    }
-    
-    if (cmdShowVersion)
-    {
-        printf("%s", "Warzone 2100 - Launcher 0.0.0\n");
-        // printf("Warzone 2100 - %s\n", version_getFormattedVersionString());
-        return EXIT_SUCCESS;
-    }    
-        
-    if (!FileSystem::init(args.at(0), WZ_WRITEDIR, config.get("configDir").toString()))
-    {
-        return EXIT_FAILURE;
-    }
-    
-    if (!FileSystem::scanDataDirs(config.get("dataDir").toString(), WZ_DATADIR))
-    {
-        return EXIT_FAILURE;
-    }
-    
-    // Its important this line is before ParseCommandLine as the user
-    // can override values by the cmd.
-    config.loadConfig("wz::config");
-       
-    // Now do the rest.
-    if (!ParseCommandLine(utfargc, utfargv))
-    {
-        return EXIT_FAILURE;
-    }   
+	// Setup debugging cmd options.
+	if (!ParseCommandLineEarly(utfargc, utfargv))
+	{
+		return EXIT_FAILURE;
+	}
 
-    QStringList tmpStringlist;
-    tmpStringlist = config.get("loadModGlobal").toStringList();
-    if (!tmpStringlist.isEmpty())
-    {
-        foreach(QString mod, tmpStringlist)
-        {
-            if (!FileSystem::loadMod(FileSystem::GAMEMOD_GLOBAL, mod))
-            {
-                wzLog(LOG_ERROR) << QString("The global mod \"%1\" does not exists.")
-                                        .arg(mod);
-            }
-            else
-            {
-                wzLog(LOG_INFO) << QString("Global mod \"%1\" enabled.")
-                                        .arg(mod);
-            }
-        }
-    }
+	if (cmdShowVersion)
+	{
+		printf("%s", "Warzone 2100 - Launcher 0.0.0\n");
+		// printf("Warzone 2100 - %s\n", version_getFormattedVersionString());
+		return EXIT_SUCCESS;
+	}
 
-    tmpStringlist = config.get("loadModSP").toStringList();
-    if (!tmpStringlist.isEmpty())
-    {
-        foreach(QString mod, tmpStringlist)
-        {
-            if (!FileSystem::loadMod(FileSystem::GAMEMOD_CAMPAIGN, mod))
-            {
-                wzLog(LOG_ERROR) << QString("The campaign mod \"%1\" does not exists.")
-                                        .arg(mod);
-            }
-            else
-            {
-                wzLog(LOG_INFO) << QString("campaign mod \"%1\" enabled.")
-                                        .arg(mod);
-            }
-        }
-    }
+	if (!FileSystem::init(args.at(0), WZ_WRITEDIR, config.get("configDir").toString()))
+	{
+		return EXIT_FAILURE;
+	}
 
-    tmpStringlist = config.get("loadModMP").toStringList();
-    if (!tmpStringlist.isEmpty())
-    {
-        foreach(QString mod, tmpStringlist)
-        {
-            if (!FileSystem::loadMod(FileSystem::GAMEMOD_MULTIPLAY, mod))
-            {
-                wzLog(LOG_ERROR) << QString("The multiplayer mod \"%1\" does not exists.")
-                                        .arg(mod);
-            }
-            else
-            {
-                wzLog(LOG_INFO) << QString("Multiplayer mod \"%1\" enabled.")
-                                        .arg(mod);
-            }
-        }
-    }
-    tmpStringlist.clear();
+	if (!FileSystem::scanDataDirs(config.get("dataDir").toString(), WZ_DATADIR))
+	{
+		return EXIT_FAILURE;
+	}
 
-    FileSystem::printSearchPath();
+	// Its important this line is before ParseCommandLine as the user
+	// can override values by the cmd.
+	config.loadConfig("wz::config");
 
-    /*** Initialize translations ***/
-    initI18n();
-    wzLog(LOG_MAIN) << QString("Using language: %1").arg(getLanguage());
+	// Now do the rest.
+	if (!ParseCommandLine(utfargc, utfargv))
+	{
+		return EXIT_FAILURE;
+	}
 
-    // wzLog(LOG_WZ) << QString("Warzone 2100 - %1").arg(version_getFormattedVersionString());
+	QStringList tmpStringlist;
+	tmpStringlist = config.get("loadModGlobal").toStringList();
+	if (!tmpStringlist.isEmpty())
+	{
+		foreach(QString mod, tmpStringlist)
+		{
+			if (!FileSystem::loadMod(FileSystem::GAMEMOD_GLOBAL, mod))
+			{
+				wzLog(LOG_ERROR) << QString("The global mod \"%1\" does not exists.")
+										.arg(mod);
+			}
+			else
+			{
+				wzLog(LOG_INFO) << QString("Global mod \"%1\" enabled.")
+										.arg(mod);
+			}
+		}
+	}
 
-    if (config.get("doCrash").toBool() ||
-        config.get("doSelftest").toBool())
-    {
-        wzLog(LOG_INFO) << "Would run engine crashtest/selftest here.";
-        return EXIT_FAILURE;
-    }
-    else if (!config.get("saveGame").toString().isEmpty() ||
-             !config.get("game").toString().isEmpty())
-    {
-        config.set("gameType", GAMETYPE_SINGLEPLAYER);
-        wzLog(LOG_INFO) << "Would open a singleplayer game here.";
-        return EXIT_FAILURE;
-    }
+	tmpStringlist = config.get("loadModSP").toStringList();
+	if (!tmpStringlist.isEmpty())
+	{
+		foreach(QString mod, tmpStringlist)
+		{
+			if (!FileSystem::loadMod(FileSystem::GAMEMOD_CAMPAIGN, mod))
+			{
+				wzLog(LOG_ERROR) << QString("The campaign mod \"%1\" does not exists.")
+										.arg(mod);
+			}
+			else
+			{
+				wzLog(LOG_INFO) << QString("campaign mod \"%1\" enabled.")
+										.arg(mod);
+			}
+		}
+	}
 
-    // Now run the frontend
-    Frontend::WzQMLView view;
-    if (cmdDoHostlaunch)
-    {
-        config.set("gameType", GAMETYPE_MULTIPLAYER);
-        view.run("screens/hostGameScreen.qml");
-    }
-    else
-    {
-        view.run();
-    }
-    
-    app.exec();
+	tmpStringlist = config.get("loadModMP").toStringList();
+	if (!tmpStringlist.isEmpty())
+	{
+		foreach(QString mod, tmpStringlist)
+		{
+			if (!FileSystem::loadMod(FileSystem::GAMEMOD_MULTIPLAY, mod))
+			{
+				wzLog(LOG_ERROR) << QString("The multiplayer mod \"%1\" does not exists.")
+										.arg(mod);
+			}
+			else
+			{
+				wzLog(LOG_INFO) << QString("Multiplayer mod \"%1\" enabled.")
+										.arg(mod);
+			}
+		}
+	}
+	tmpStringlist.clear();
 
-    config.storeConfig("wz::config", CONFCONTEXT_USER);
+	FileSystem::printSearchPath();
 
-    FileSystem::exit();
-    debug_exit();
+	/*** Initialize translations ***/
+	initI18n();
+	wzLog(LOG_MAIN) << QString("Using language: %1").arg(getLanguage());
+
+	// wzLog(LOG_WZ) << QString("Warzone 2100 - %1").arg(version_getFormattedVersionString());
+
+	if (config.get("doCrash").toBool() ||
+		config.get("doSelftest").toBool())
+	{
+		wzLog(LOG_INFO) << "Would run engine crashtest/selftest here.";
+		return EXIT_FAILURE;
+	}
+	else if (!config.get("saveGame").toString().isEmpty() ||
+			 !config.get("game").toString().isEmpty())
+	{
+		config.set("gameType", GAMETYPE_SINGLEPLAYER);
+		wzLog(LOG_INFO) << "Would open a singleplayer game here.";
+		return EXIT_FAILURE;
+	}
+
+	// Now run the frontend
+	Frontend::WzQMLView view;
+	if (cmdDoHostlaunch)
+	{
+		config.set("gameType", GAMETYPE_MULTIPLAYER);
+		view.run("screens/hostGameScreen.qml");
+	}
+	else
+	{
+		view.run();
+	}
+
+	app.exec();
+
+	config.storeConfig("wz::config", CONFCONTEXT_USER);
+
+	FileSystem::exit();
+	debug_exit();
 }
