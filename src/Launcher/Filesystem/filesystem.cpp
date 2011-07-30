@@ -483,11 +483,11 @@ static bool rebuildSearchPath( searchPathMode mode, bool force)
             wzLog(LOG_ERROR) << QString("Can't switch to unknown mods %1").arg(mode);
             return false;
         }
-
-        // User's home dir must be first so we allways see what we write
-        PHYSFS_removeFromSearchPath(PHYSFS_getWriteDir());
-        PHYSFS_addToSearchPath(PHYSFS_getWriteDir(), PHYSFS_PREPEND);
     }
+
+	// User's home dir must be first so we allways see what we write
+	PHYSFS_removeFromSearchPath(PHYSFS_getWriteDir());
+	PHYSFS_addToSearchPath(PHYSFS_getWriteDir(), PHYSFS_PREPEND);
 
     return true;
 }
@@ -550,6 +550,10 @@ void loadMaps()
             }
         }
     }
+
+	// User's home dir must be first so we allways see what we write
+	PHYSFS_removeFromSearchPath(PHYSFS_getWriteDir());
+	PHYSFS_addToSearchPath(PHYSFS_getWriteDir(), PHYSFS_PREPEND);
 }
 
 bool loadMap(const char *path)
@@ -645,13 +649,10 @@ static void findAvailableMods(bool forceReload)
 
     foreach(QString path, searchPathRegistry)
     {
-        if (QString(PHYSFS_getWriteDir()) != path)
-        {
-            if (!PHYSFS_removeFromSearchPath(path.toUtf8().constData()))
-            {
-                wzLog(LOG_FS) << QString("Failed to remove path %1 again").arg(path);
-            }
-        }
+		if (!PHYSFS_removeFromSearchPath(path.toUtf8().constData()))
+		{
+			wzLog(LOG_FS) << QString("Failed to remove path %1 again").arg(path);
+		}
     }
 
     rebuildSearchPath(lastSearchMode);
