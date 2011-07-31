@@ -22,7 +22,7 @@
  * lexer for loading level description files
  */	
 
-#include "map_p.h"
+#include "src/Launcher/Map/map_p.h"
 
 #include "lib/framework/frame.h"
 #include "lib/framework/string_ext.h"

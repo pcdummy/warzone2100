@@ -18,6 +18,7 @@ BASELIST = \
 	components \
 	effects \
 	features \
+	frontend \
 	gamedesc.lev \
 	images \
 	messages \

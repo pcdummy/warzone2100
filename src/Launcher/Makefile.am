@@ -1,4 +1,4 @@
-%_moc.cpp: %.h
+%_moc.cpp: %.h dirs
 	$(MOC4) -o $@ $<
 
 %.lex.hpp %.lex.cpp:: %.l
@@ -9,6 +9,9 @@ AM_CFLAGS = $(WZ_CFLAGS)
 AM_CXXFLAGS = $(WZ_CXXFLAGS) $(QT4_CFLAGS)
 AM_LFLAGS = $(FLEX_FLAGS)
 AM_YFLAGS = -d
+
+dirs:
+	$(MKDIR_P) Frontend Map
 
 MOCHEADER = \
 	confighandler.h \
